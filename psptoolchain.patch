@@ -1,0 +1,24 @@
+diff -uprN psptoolchain/scripts/001-binutils-2.22.sh psptoolchain_/scripts/001-binutils-2.22.sh
+--- psptoolchain/scripts/001-binutils-2.22.sh	2019-03-13 03:12:13.386679383 +0900
++++ psptoolchain_/scripts/001-binutils-2.22.sh	2019-03-13 03:11:22.858874660 +0900
+@@ -4,6 +4,8 @@
+  ## Exit on errors
+  set -e
+ 
++ clone_git_repo github.com pspdev pspsdk
++
+  ## Download the source code if it does not already exist.
+  download_and_extract https://ftp.gnu.org/pub/gnu/binutils/binutils-2.22.tar.bz2 binutils-2.22
+ 
+diff -uprN psptoolchain/scripts/003-pspsdk-stage1.sh psptoolchain_/scripts/003-pspsdk-stage1.sh
+--- psptoolchain/scripts/003-pspsdk-stage1.sh	2019-03-13 03:12:13.386679383 +0900
++++ psptoolchain_/scripts/003-pspsdk-stage1.sh	2019-03-13 03:11:24.018870182 +0900
+@@ -5,7 +5,7 @@
+  set -e
+ 
+  ## Download the source code if it does not already exist.
+- clone_git_repo github.com pspdev pspsdk
++ #clone_git_repo github.com pspdev pspsdk
+ 
+  ## Enter the source directory.
+  cd pspsdk

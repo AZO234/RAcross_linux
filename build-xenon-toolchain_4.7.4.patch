@@ -1,0 +1,20 @@
+--- libxenon/toolchain/build-xenon-toolchain	2019-03-11 18:01:01.366214806 +0900
++++ libxenon/toolchain/build-xenon-toolchain_	2019-03-11 18:29:50.495028850 +0900
+@@ -8,7 +8,7 @@ PREFIX=~/tools/xenon # Install location
+ PARALLEL=
+ 
+ BINUTILS=binutils-2.22
+-GCC=gcc-4.7.1
++GCC=gcc-4.7.4
+ NEWLIB=newlib-1.20.0
+ GDB=gdb-6.8
+ 
+@@ -97,7 +97,7 @@ function toolchain_install
+ 
+         if $BUILD_GCC; then
+         echo -e "Extracting gcc..."
+-        tar xfj $GCC.tar.bz2 >> $LOGFILE 2>&1 && cat gcc.diff | patch -p0 >> $LOGFILE 2>&1 || exit 0
++        tar xfj $GCC.tar.bz2 >> $LOGFILE 2>&1 && cat gcc.diff_4.7.4 | patch -p0 >> $LOGFILE 2>&1 || exit 0
+         cd build
+         echo -e "Configuring gcc..."
+         MAKEINFO=missing ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local -enable-interwork \

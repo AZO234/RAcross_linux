@@ -1,0 +1,47 @@
+--- libxenon/toolchain/build-xenon-toolchain	2019-03-11 17:10:22.421127898 +0900
++++ libxenon/toolchain/build-xenon-toolchain_	2019-03-11 17:09:35.781389000 +0900
+@@ -4,7 +4,7 @@
+ # changed for xenon by Felix Domke <tmbinc@elitedvb.net>, still public domain
+ 
+ TARGET=xenon
+-PREFIX=/usr/local/xenon # Install location of your final toolchain
++PREFIX=~/RAcross-tools/xenon # Install location of your final toolchain
+ PARALLEL=
+ 
+ BINUTILS=binutils-2.22
+@@ -35,7 +35,7 @@ DEB=false
+ 
+ # temp variables export
+ export PATH="$PATH:$PREFIX/bin"
+-export DEVKITXENON="/usr/local/xenon"
++export DEVKITXENON="~/RAcross-tools/xenon"
+ export PATH="$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin"
+ 
+ # function to compile and install libxenon
+@@ -100,7 +100,7 @@ function toolchain_install
+         tar xfj $GCC.tar.bz2 >> $LOGFILE 2>&1 && cat gcc.diff | patch -p0 >> $LOGFILE 2>&1 || exit 0
+         cd build
+         echo -e "Configuring gcc..."
+-        ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local -enable-interwork \
++        MAKEINFO=missing ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local -enable-interwork \
+                 --enable-languages="c" --without-headers --disable-shared \
+                 --with-newlib --disable-libmudflap --disable-libssp --disable-nls --disable-shared --without-headers \
+                 --disable-decimal-float --enable-altivec\
+@@ -133,7 +133,7 @@ function toolchain_install
+         # Yes, you need to build gcc again!
+         cd build
+         echo -e "Configuring gcc - 2nd pass..."
+-        ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local --with-cpu=cell \
++        MAKEINFO=missing ../$GCC/configure --target=$TARGET --prefix=$PREFIX --with-libiconv-prefix=/opt/local --with-cpu=cell \
+                 --with-gmp=/opt/local --with-mpfr=/opt/local --disable-decimal-float --disable-libquadmath \
+                 --enable-languages=c,c++ --disable-libssp --with-newlib --enable-cxx-flags="-G0" \
+                 --disable-libmudflap --disable-nls --disable-shared --disable-linux-futex --enable-altivec \
+@@ -365,7 +365,7 @@ function all_done
+ 	echo
+ 	echo -e "${RED}Please add the following path to your login script (~/.bashrc)"
+ 	echo
+-	echo -e "export DEVKITXENON=\"/usr/local/xenon\""
++	echo -e "export DEVKITXENON=\"~/RAcross-tools/xenon\""
+ 	echo -e "export PATH=\"\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin\""
+ 	echo -e "${NC}"
+ }

@@ -1,0 +1,51 @@
+diff -uprN buildscripts/build-devkit.sh buildscripts_/build-devkit.sh
+--- buildscripts/build-devkit.sh	2019-03-10 05:13:40.993984203 +0900
++++ buildscripts_/build-devkit.sh	2019-03-10 05:08:37.147379000 +0900
+@@ -115,14 +115,15 @@ fi
+ #---------------------------------------------------------------------------------
+ 
+ if [ ! -z "$BUILD_DKPRO_INSTALLDIR" ] ; then
+-	INSTALLDIR="$BUILD_DKPRO_INSTALLDIR"
++	export INSTALLDIR="$BUILD_DKPRO_INSTALLDIR"
+ else
+ 	echo
+ 	echo "Please enter the directory where you would like '$package' to be installed:"
+ 	echo "for mingw/msys you must use <drive>:/<install path> or you will have include path problems"
+ 	echo "this is the top level directory for devkitpro, i.e. e:/devkitPro"
+ 
+-	read -e INSTALLDIR
++	read -e INSTALLDIRH
++	export INSTALLDIR="$INSTALLDIRH"
+ 	echo
+ fi
+ 
+diff -uprN buildscripts/dkarm-eabi/scripts/build-libs.sh buildscripts_/dkarm-eabi/scripts/build-libs.sh
+--- buildscripts/dkarm-eabi/scripts/build-libs.sh	2019-03-10 05:13:41.001984165 +0900
++++ buildscripts_/dkarm-eabi/scripts/build-libs.sh	2019-03-10 03:03:35.985516025 +0900
+@@ -14,6 +14,7 @@ cd $BUILDDIR
+ mkdir -p rules
+ cd rules
+ tar -xvf $SRCDIR/devkitarm-rules-$DKARM_RULES_VER.tar.xz
++patch Makefile < $RACROSS_BASE/devkitarm-rules_Makefile.patch
+ make install
+ 
+ #---------------------------------------------------------------------------------
+@@ -24,6 +25,7 @@ cd $BUILDDIR
+ mkdir -p crtls
+ cd crtls
+ tar -xvf $SRCDIR/devkitarm-crtls-$DKARM_CRTLS_VER.tar.xz
++patch Makefile < $RACROSS_BASE/devkitarm-crtls_Makefile.patch
+ make install
+ 
+ cd $BUILDDIR/libgba-$LIBGBA_VER
+diff -uprN buildscripts/dkppc/scripts/build-libs.sh buildscripts_/dkppc/scripts/build-libs.sh
+--- buildscripts/dkppc/scripts/build-libs.sh	2019-03-10 05:13:41.001984165 +0900
++++ buildscripts_/dkppc/scripts/build-libs.sh	2019-03-10 03:04:23.793197924 +0900
+@@ -7,6 +7,7 @@ cd $BUILDDIR
+ mkdir -p rules
+ cd rules
+ tar -xvf $SRCDIR/devkitppc-rules-$DKPPC_RULES_VER.tar.xz
++patch Makefile < $RACROSS_BASE/devkitppc-rules_Makefile.patch
+ make install
+ 
+ cd $BUILDDIR/libogc-$LIBOGC_VER

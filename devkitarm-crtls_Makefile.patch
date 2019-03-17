@@ -1,0 +1,15 @@
+--- devkitarm-crtls-1.0.0/Makefile	2019-02-19 23:41:19.000000000 +0900
++++ devkitarm-crtls-1.0.0/Makefile_	2019-03-10 02:47:56.680304747 +0900
+@@ -16,9 +16,9 @@ all:	armv6k/fpu thumb \
+ 	armv6k/fpu/3dsx_crt0.o
+ 
+ install: all
+-	@mkdir -p $(DESTDIR)/opt/devkitpro/devkitARM/arm-none-eabi/lib
+-	@cp -v *.specs *.ld *.mem $(DESTDIR)/opt/devkitpro/devkitARM/arm-none-eabi/lib
+-	@cp -rv thumb armv6k *.o $(DESTDIR)/opt/devkitpro/devkitARM/arm-none-eabi/lib
++	@mkdir -p $(INSTALLDIR)/devkitARM/arm-none-eabi/lib
++	@cp -v *.specs *.ld *.mem $(INSTALLDIR)/devkitARM/arm-none-eabi/lib
++	@cp -rv thumb armv6k *.o $(INSTALLDIR)/devkitARM/arm-none-eabi/lib
+ 
+ clean:
+ 	rm -fr thumb armv6k *.o

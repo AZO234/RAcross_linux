@@ -1,0 +1,21 @@
+--- install-vitasdk.sh	2019-03-12 07:59:18.105122172 +0900
++++ install-vitasdk_.sh	2019-03-12 07:59:02.469206627 +0900
+@@ -16,12 +16,13 @@ install_vitasdk () {
+      ;;
+ 
+      Linux*)
+-      if [ -n "${TRAVIS}" ]; then
+-          sudo apt-get install libc6-i386 lib32stdc++6 lib32gcc1 patch
+-      fi
++#      if [ -n "${TRAVIS}" ]; then
++#          sudo apt-get install libc6-i386 lib32stdc++6 lib32gcc1 patch
++#      fi
+       if [ ! -d "$INSTALLDIR" ]; then
+-        sudo mkdir -p $INSTALLDIR
+-        sudo chown $USER:$(id -gn $USER) $INSTALLDIR
++#        sudo mkdir -p $INSTALLDIR
++#        sudo chown $USER:$(id -gn $USER) $INSTALLDIR
++        mkdir -p $INSTALLDIR
+       fi
+       wget -O "vitasdk-nightly.tar.bz2" "$(get_download_link linux)"
+       tar xf "vitasdk-nightly.tar.bz2" -C $INSTALLDIR --strip-components=1
