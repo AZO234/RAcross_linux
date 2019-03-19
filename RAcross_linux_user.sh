@@ -208,16 +208,10 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export DEVKITARM=$DEVKITPRO/devkitARM
 	export DEVKITA64=$DEVKITPRO/devkitA64
 	export DEVKITPPC=$DEVKITPRO/devkitPPC
-	export LIBCTRU=${RACROSS_TOOLS}/devkitpro/libctru
-	export LIBOGC=${RACROSS_TOOLS}/devkitpro/libogc
-	export LIBNX=${RACROSS_TOOLS}/devkitpro/libnx
 	echo "export DEVKITPRO=${RACROSS_TOOLS}/devkitpro" >> ${RACROSS_INITSCRIPT}
 	echo "export DEVKITARM=\$DEVKITPRO/devkitARM" >> ${RACROSS_INITSCRIPT}
 	echo "export DEVKITA64=\$DEVKITPRO/devkitA64" >> ${RACROSS_INITSCRIPT}
 	echo "export DEVKITPPC=\$DEVKITPRO/devkitPPC" >> ${RACROSS_INITSCRIPT}
-	echo "export LIBCTRU=\$DEVKITPRO/libctru" >> ${RACROSS_INITSCRIPT}
-	echo "export LIBOGC=\$DEVKITPRO/libogc" >> ${RACROSS_INITSCRIPT}
-	echo "export LIBNX=\$DEVKITPRO/libnx" >> ${RACROSS_INITSCRIPT}
 	cd buildscripts
 	cp config1.sh config.sh
 	./build-devkit.sh
