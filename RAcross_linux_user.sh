@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source config.sh
+source RAcross_config.sh
 
 RACROSS_INITSCRIPT=~/.profile
 

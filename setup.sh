@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source config.sh
+source RAcross_config.sh
 
 export RACROSS_BASE=`pwd`
 
