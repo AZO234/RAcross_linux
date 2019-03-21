@@ -331,7 +331,6 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	./emsdk install latest
 	./emsdk activate latest
 	source ./emsdk_env.sh
-	source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh
 	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
 fi
 
