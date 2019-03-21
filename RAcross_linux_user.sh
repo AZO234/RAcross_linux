@@ -328,10 +328,15 @@ else
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export EMSDK=${RACROSS_TOOLS}/emsdk
-	export PATH=$PATH:${EMSDK}/emscripten/1.38.28
+	export PATH=$PATH:$EMSDK/emscripten/1.38.28
 	export EM_CONFIG=/home/${USER}/.emscripten
-	export EMSCRIPTEN_NATIVE_OPTIMIZER=${EMSDK}/clang/e1.38.28_64bit/optimizer
-	export EMSCRIPTEN=${EMSDK}/emscripten/1.38.28
+	export EMSCRIPTEN_NATIVE_OPTIMIZER=$EMSDK/clang/e1.38.28_64bit/optimizer
+	export EMSCRIPTEN=$EMSDK/emscripten/1.38.28
+	echo "export EMSDK=${RACROSS_TOOLS}/emsdk" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:\$EMSDK/emscripten/1.38.28" >> ${RACROSS_INITSCRIPT}
+	echo "export EM_CONFIG=/home/${USER}/.emscripten" >> ${RACROSS_INITSCRIPT}
+	echo "export EMSCRIPTEN_NATIVE_OPTIMIZER=\$EMSDK/clang/e1.38.28_64bit/optimizer" >> ${RACROSS_INITSCRIPT}
+	echo "export EMSCRIPTEN=\$EMSDK/emscripten/1.38.28" >> ${RACROSS_INITSCRIPT}
 	cd emsdk
 	./emsdk install latest
 	./emsdk activate latest
