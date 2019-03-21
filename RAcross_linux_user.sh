@@ -327,24 +327,21 @@ else
 	tar Jxfv ${RACROSS_CACHE}/emsdk.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
+	EMSCRIPEN_VER=`tail -n 1 ${RACROSS_TOOLS}/emsdk/emscripten-tags.txt`
 	export EMSDK=${RACROSS_TOOLS}/emsdk
-	export PATH=$PATH:$EMSDK/emscripten/1.38.28
+	export PATH=$PATH:$EMSDK/emscripten/${EMSCRIPEN_VER}
 	export EM_CONFIG=/home/${USER}/.emscripten
-	export EMSCRIPTEN_NATIVE_OPTIMIZER=$EMSDK/clang/e1.38.28_64bit/optimizer
-	export EMSCRIPTEN=$EMSDK/emscripten/1.38.28
+	export EMSCRIPTEN_NATIVE_OPTIMIZER=$EMSDK/clang/e${EMSCRIPEN_VER}_64bit/optimizer
+	export EMSCRIPTEN=$EMSDK/emscripten/${EMSCRIPEN_VER}
 	echo "export EMSDK=${RACROSS_TOOLS}/emsdk" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$EMSDK/emscripten/1.38.28" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:\$EMSDK/emscripten/${EMSCRIPEN_VER}" >> ${RACROSS_INITSCRIPT}
 	echo "export EM_CONFIG=/home/${USER}/.emscripten" >> ${RACROSS_INITSCRIPT}
-	echo "export EMSCRIPTEN_NATIVE_OPTIMIZER=\$EMSDK/clang/e1.38.28_64bit/optimizer" >> ${RACROSS_INITSCRIPT}
-	echo "export EMSCRIPTEN=\$EMSDK/emscripten/1.38.28" >> ${RACROSS_INITSCRIPT}
+	echo "export EMSCRIPTEN_NATIVE_OPTIMIZER=\$EMSDK/clang/e${EMSCRIPEN_VER}_64bit/optimizer" >> ${RACROSS_INITSCRIPT}
+	echo "export EMSCRIPTEN=\$EMSDK/emscripten/${EMSCRIPEN_VER}" >> ${RACROSS_INITSCRIPT}
 	cd emsdk
 	./emsdk install latest
 	./emsdk activate latest
 	source ./emsdk_env.sh
-	if [ ${RACROSS_SETUP_DELETE} = 1 ] ; then
-		cd ${RACROSS_BASE}
-		rm -rf emsdk
-	fi
 fi
 
 # Android NDK
