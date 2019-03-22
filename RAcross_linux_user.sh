@@ -2,6 +2,10 @@
 
 source RAcross_config.sh
 
+export RACROSS_TOOLS=${HOME}/RAcross-tools
+rm -rf ${RACROSS_TOOLS}
+mkdir -p ${RACROSS_TOOLS}
+
 RACROSS_INITSCRIPT=~/.profile
 
 # psptoolchain
@@ -330,8 +334,8 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd emsdk
 	./emsdk install latest
 	./emsdk activate latest
-	source ./emsdk_env.sh
-	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
+#	source ./emsdk_env.sh
+#	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
 fi
 
 # Android NDK
