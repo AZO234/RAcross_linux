@@ -3,15 +3,16 @@
 LR_CORE=np2kai
 LR_CORE_SRC=~/NP2kai
 
-LR_DIST_CLEAN=1
+LR_DISTLOG_CLEAN=1
 LR_SRC_FETCH=0
 
 export RACROSS_TOOLS=${HOME}/RAcross-tools
 
 cd ~/libretro-super
 
-if [ ${LR_DIST_CLEAN} = 1 ] ; then
+if [ ${LR_DISTLOG_CLEAN} = 1 ] ; then
 rm -rf dist/*
+rm -rf log/*
 fi
 
 unset CC
