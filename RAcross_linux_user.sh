@@ -8,18 +8,24 @@ mkdir -p ${RACROSS_TOOLS}
 
 RACROSS_INITSCRIPT=~/.profile
 
+mkdir ~/.ssh
+touch ~/.ssh/known_hosts
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+
 # psptoolchain
 echo "*** setup psptoolchain ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone --depth=1 https://github.com/pspdev/psptoolchain.git
-	patch -p1 -d psptoolchain < ${RACROSS_BASE}/psptoolchain.patch
-	tar Jcvf ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
+	git clone --depth=1 https://github.com/AZO234/psptoolchain.git
+	cd psptoolchain
+	git checkout fix
+	cd ..
+	tar -Jcf ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf psptoolchain
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/psptoolchain.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/psptoolchain.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export PSPDEV=${RACROSS_TOOLS}/pspdev
@@ -43,16 +49,16 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 fi
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
 	git clone --recursive https://github.com/reswitched/libtransistor
-	tar Jcvf ${RACROSS_CACHE}/libtransistor.tar.xz libtransistor
+	tar -Jcf ${RACROSS_CACHE}/libtransistor.tar.xz libtransistor
 	git clone --recursive https://github.com/reswitched/libtransistor-base
-	tar Jcvf ${RACROSS_CACHE}/libtransistor-base.tar.xz libtransistor-base
+	tar -Jcf ${RACROSS_CACHE}/libtransistor-base.tar.xz libtransistor-base
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf libtransistor-base
 		rm -rf libtransistor
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/libtransistor.tar.xz
-	tar Jxfv ${RACROSS_CACHE}/libtransistor-base.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/libtransistor.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/libtransistor-base.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd libtransistor-base
@@ -74,13 +80,16 @@ fi
 echo "*** setup crosstool-NG ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone --depth=1 https://github.com/crosstool-ng/crosstool-ng
-	tar Jcvf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
+	git clone --depth=1 https://github.com/AZO234/crosstool-ng
+	cd crosstool-ng
+	git checkout RPi4
+	cd ..
+	tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf crosstool-ng
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/crosstool-ng.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/crosstool-ng.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd crosstool-ng
@@ -115,7 +124,7 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	fi
 fi
 
-echo "*** setup RPi3 cross env ***"
+echo "*** setup armv8 RPi3 cross env ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	mkdir armv8-rpi3-linux
@@ -132,6 +141,40 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	fi
 fi
 
+echo "*** setup aarch64 RPi3 cross env ***"
+cd ${RACROSS_BASE}
+if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
+	mkdir aarch64-rpi3-linux-gnu
+	cd aarch64-rpi3-linux-gnu
+	ct-ng aarch64-rpi3-linux-gnu
+	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+	mv .config_mod .config
+	ct-ng build
+	export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/buildtools/bin
+	echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
+	if [ ${RACROSS_SETUP_DELETE} = 1 ] ; then
+		cd ${RACROSS_BASE}
+		rm -rf aarch64-rpi3-linux-gnu
+	fi
+fi
+
+echo "*** setup aarch64 RPi4 cross env ***"
+cd ${RACROSS_BASE}
+if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
+	mkdir aarch64-rpi4-linux-gnu
+	cd aarch64-rpi4-linux-gnu
+	ct-ng aarch64-rpi4-linux-gnu
+	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+	mv .config_mod .config
+	ct-ng build
+	export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/buildtools/bin
+	echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
+	if [ ${RACROSS_SETUP_DELETE} = 1 ] ; then
+		cd ${RACROSS_BASE}
+		rm -rf aarch64-rpi4-linux-gnu
+	fi
+fi
+
 # Xenon_Toolchain
 echo "*** setup Xenon_Toolchain ***"
 cd ${RACROSS_BASE}
@@ -142,16 +185,17 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	echo "export PATH=\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin" >> ${RACROSS_INITSCRIPT}
 fi
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone --depth=1 https://github.com/Free60Project/libxenon.git
-	patch libxenon/toolchain/build-xenon-toolchain < ${RACROSS_BASE}/build-xenon-toolchain.patch
-	patch libxenon/toolchain/build-xenon-toolchain < ${RACROSS_BASE}/build-xenon-toolchain_4.7.4.patch
+	git clone --depth=1 https://github.com/AZO234/libxenon.git
+	cd crosstool-ng
+	git checkout fix
+	cd ..
 	cp ${RACROSS_BASE}/gcc.diff_4.7.4 libxenon/toolchain/
-	tar Jcvf ${RACROSS_CACHE}/libxenon.tar.xz libxenon
+	tar -Jcf ${RACROSS_CACHE}/libxenon.tar.xz libxenon
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf libxenon
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/libxenon.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/libxenon.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd libxenon/toolchain
@@ -172,14 +216,16 @@ if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	echo "export PATH=\$VITASDK/bin:\$PATH" >> ${RACROSS_INITSCRIPT}
 fi
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone --depth=1 https://github.com/vitasdk/vdpm
-	patch vdpm/include/install-vitasdk.sh < ${RACROSS_BASE}/install-vita_sdk.patch
-	tar Jcvf ${RACROSS_CACHE}/vdpm.tar.xz vdpm
+	git clone --depth=1 https://github.com/AZO234/vdpm
+	cd vdpm
+	git checkout fix
+	cd ..
+	tar -Jcf ${RACROSS_CACHE}/vdpm.tar.xz vdpm
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf vdpm
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/vdpm.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/vdpm.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd vdpm
@@ -196,16 +242,15 @@ echo "*** setup devkitPro ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
 	git clone --depth=1 https://github.com/devkitPro/buildscripts.git
-	patch -p1 -d buildscripts < ${RACROSS_BASE}/buildscripts.patch
 	cp ${RACROSS_BASE}/config1.sh buildscripts/
 	cp ${RACROSS_BASE}/config2.sh buildscripts/
 	cp ${RACROSS_BASE}/config3.sh buildscripts/
-	tar Jcvf ${RACROSS_CACHE}/buildscripts.tar.xz buildscripts
+	tar -Jcf ${RACROSS_CACHE}/buildscripts.tar.xz buildscripts
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf buildscripts
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/buildscripts.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/buildscripts.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export DEVKITPRO=${RACROSS_TOOLS}/devkitpro
@@ -233,14 +278,14 @@ fi
 echo "*** setup ps2toolchain ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone https://github.com/ps2dev/ps2toolchain.git
-	tar Jcvf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
-	git clone https://github.com/ps2dev/ps2sdk-ports.git
-	tar Jcvf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
-	git clone https://github.com/ps2dev/gsKit.git
-	tar Jcvf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
-	git clone https://github.com/ps2dev/ps2-packer.git
-	tar Jcvf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
+	git clone --depth=1 https://github.com/ps2dev/ps2toolchain.git
+	tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
+	git clone --depth=1 https://github.com/ps2dev/ps2sdk-ports.git
+	tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
+	git clone --depth=1 https://github.com/ps2dev/gsKit.git
+	tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
+	git clone --depth=1 https://github.com/ps2dev/ps2-packer.git
+	tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf ps2toolchain
 		rm -rf ps2sdk-ports
@@ -248,10 +293,10 @@ if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
 		rm -rf ps2-packer
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/ps2toolchain.tar.xz
-	tar Jxfv ${RACROSS_CACHE}/ps2sdk-ports.tar.xz
-	tar Jxfv ${RACROSS_CACHE}/gsKit.tar.xz
-	tar Jxfv ${RACROSS_CACHE}/ps2-packer.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps2toolchain.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/gsKit.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps2-packer.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export PS2DEV=${RACROSS_TOOLS}/ps2dev
@@ -286,12 +331,12 @@ mkdir -p ${RACROSS_TOOLS}/ps3dev
 cd ${RACROSS_TOOLS}/ps3dev
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
 	git clone --depth=1 https://github.com/ps3dev/ps3toolchain.git
-	tar Jcvf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
+	tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf ps3toolchain
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/ps3toolchain.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps3toolchain.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	export PS3DEV=${RACROSS_TOOLS}/ps3dev
@@ -323,12 +368,12 @@ if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
 	./emsdk update
 	git pull
 	cd ${RACROSS_TOOLS}
-	tar Jcvf ${RACROSS_CACHE}/emsdk.tar.xz emsdk
+	tar -Jcf ${RACROSS_CACHE}/emsdk.tar.xz emsdk
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf emsdk
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/emsdk.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/emsdk.tar.xz
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
 	cd emsdk
@@ -342,35 +387,30 @@ fi
 echo "*** setup Android NDK ***"
 cd ${RACROSS_BASE}
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	wget https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip -P ${RACROSS_CACHE}
+	wget https://dl.google.com/android/repository/android-ndk-r20-linux-x86_64.zip -P ${RACROSS_CACHE}
 fi
 if [ ${RACROSS_SETUP_INSTALL} = 1 ] ; then
-	unzip ${RACROSS_CACHE}/android-ndk-r18b-linux-x86_64.zip -d ${RACROSS_TOOLS}/
-	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r18b
-	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r18b
-	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r18b" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r18b" >> ${RACROSS_INITSCRIPT}
+	unzip ${RACROSS_CACHE}/android-ndk-r20-linux-x86_64.zip -d ${RACROSS_TOOLS}/
+	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20
+	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r20
+	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r20" >> ${RACROSS_INITSCRIPT}
 fi
 
 # libretro-super
 echo "*** setup libretro-super ***"
 cd ~
 if [ ${RACROSS_SETUP_CACHE} = 1 ] ; then
-	git clone --depth=1 https://github.com/libretro/libretro-super.git
-	patch -p1 -d libretro-super < ${RACROSS_BASE}/libretro-super.patch
-	chmod +x libretro-super/libretro-build-android-mk.sh
-	chmod +x libretro-super/libretro-build-emscripten.sh
-	chmod +x libretro-super/libretro-build-libnx.sh
-	chmod +x libretro-super/libretro-build-psl1ght.sh
-	chmod +x libretro-super/libretro-build-xenon.sh
-	chmod +x libretro-super/libretro-build-rpi2.sh
-	chmod +x libretro-super/libretro-build-rpi3.sh
-	tar Jcvf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
+	git clone --depth=1 https://github.com/AZO234/libretro-super.git
+	cd crosstool-ng
+	git checkout AZO_fix
+	cd ..
+	tar -Jcf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
 	if [ ${RACROSS_SETUP_INSTALL} = 0 ] ; then
 		rm -rf libretro-super
 	fi
 else
-	tar Jxfv ${RACROSS_CACHE}/libretro-super.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/libretro-super.tar.xz
 fi
 
 # build scripts

@@ -177,12 +177,12 @@ fi
 echo "=== Emscripten - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_emscripten.log
 
+# RPi2
 export CC=armv7-rpi2-linux-gnueabihf-gcc
 export CXX=armv7-rpi2-linux-gnueabihf-g++
 export AR=armv7-rpi2-linux-gnueabihf-ar
 export LD=armv7-rpi2-linux-gnueabihf-g++
 
-# RPi2
 rm -rf libretro-${LR_CORE}
 echo "=== RPi2 - build start ==="
 if [ ${LR_SRC_FETCH} = 1 ] ; then
@@ -194,22 +194,56 @@ fi
 echo "=== RPi2 - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_rpi2.log
 
+# ARMv8 RPi3
 export CC=armv8-rpi3-linux-gnueabihf-gcc
 export CXX=armv8-rpi3-linux-gnueabihf-g++
 export AR=armv8-rpi3-linux-gnueabihf-ar
 export LD=armv8-rpi3-linux-gnueabihf-g++
 
-# RPi3
 rm -rf libretro-${LR_CORE}
-echo "=== RPi3 - build start ==="
+echo "=== ARMv8 RPi3 - build start ==="
 if [ ${LR_SRC_FETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
 fi
-./libretro-build-rpi3.sh ${LR_CORE}
-echo "=== RPi3 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_rpi3.log
+./libretro-build-armv8-rpi3.sh ${LR_CORE}
+echo "=== ARMv8 RPi3 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_armv8_rpi3.log
+
+# AArch64 RPi3
+export CC=aarch64-rpi3-linux-gnu-gcc
+export CXX=aarch64-rpi3-linux-gnu-g++
+export AR=aarch64-rpi3-linux-gnu-ar
+export LD=aarch64-rpi3-linux-gnu-g++
+
+rm -rf libretro-${LR_CORE}
+echo "=== AArch64 RPi3 - build start ==="
+if [ ${LR_SRC_FETCH} = 1 ] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-aarch64-rpi3.sh ${LR_CORE}
+echo "=== AArch64 RPi3 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_aarch64_rpi3.log
+
+# RPi4
+export CC=aarch64-rpi4-linux-gnu-gcc
+export CXX=aarch64-rpi4-linux-gnu-g++
+export AR=aarch64-rpi4-linux-gnu-ar
+export LD=aarch64-rpi4-linux-gnu-g++
+
+rm -rf libretro-${LR_CORE}
+echo "=== RPi4 - build start ==="
+if [ ${LR_SRC_FETCH} = 1 ] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-rpi4.sh ${LR_CORE}
+echo "=== RPi4 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_rpi4.log
 
 unset CC
 unset CXX

@@ -3,7 +3,7 @@ RAcross_linux
 
 RAcross is libretro(RA?)'s core cross build emvironment.
 
-	- Use Ubuntu 18.10 (Vanilla)
+	- Use Ubuntu 19.10 (Vanilla)
 
 RAcross_linux can test follow cross builds
 
@@ -22,6 +22,7 @@ RAcross_linux can test follow cross builds
 	- Emscripten
 	- RPi2
 	- RPi3
+	- RPi4
 
 install
 -------
@@ -38,6 +39,7 @@ install
 		- crosstool-NG
 			- RPi2
 			- RPi3
+			- RPi4
 		- Xenon_Toolchain
 		- Vita SDK
 		- devkitPro
@@ -57,5 +59,6 @@ usage
 	3. edit libretro-super/build-core.sh, LR_CORE and LR_CORE_SRC value
 	4. cd libretro-super
 	5. ./build-core.sh
-	6. build logs are output in log dir
+	6. build logs are output in 'log' dir  
+	binalys are output in 'dist' dir
 
