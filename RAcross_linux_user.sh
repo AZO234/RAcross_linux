@@ -78,9 +78,6 @@ echo "*** setup crosstool-NG ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
 	git clone --depth=1 https://github.com/AZO234/crosstool-ng
-	cd crosstool-ng
-	git checkout RPi4
-	cd ..
 	tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf crosstool-ng
