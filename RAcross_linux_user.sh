@@ -16,10 +16,7 @@ ssh-keyscan github.com >> ~/.ssh/known_hosts
 echo "*** setup psptoolchain ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/AZO234/psptoolchain.git
-	cd psptoolchain
-	git checkout fix
-	cd ..
+	git clone --depth=1 https://github.com/pspdev/psptoolchain.git
 	tar -Jcf ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf psptoolchain
