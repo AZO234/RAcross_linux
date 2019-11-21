@@ -416,7 +416,7 @@ echo "*** setup libretro-super ***"
 cd ~
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
 	git clone https://github.com/AZO234/libretro-super.git
-	cd crosstool-ng
+	cd libretro-super
 	git checkout AZO_fix
 	cd ..
 	tar -Jcf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
