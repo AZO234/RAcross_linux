@@ -246,6 +246,7 @@ if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
 	cd buildscripts
 	git remote add AZO234 https://github.com/AZO234/buildscripts.git
 	git pull --no-edit AZO234 fix
+	cd ..
 	cp ${RACROSS_BASE}/config1.sh buildscripts/
 	cp ${RACROSS_BASE}/config2.sh buildscripts/
 	cp ${RACROSS_BASE}/config3.sh buildscripts/

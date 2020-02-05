@@ -2,6 +2,15 @@
 
 source RAcross_config.sh
 
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+rm -rf ${RACROSS_CACHE}
+mkdir -p ${RACROSS_CACHE}
+chown ${SUDO_USER}: ${RACROSS_CACHE}
+fi
+rm -rf ${RACROSS_TOOLS}
+mkdir -p ${RACROSS_TOOLS}
+chown ${SUDO_USER}: ${RACROSS_TOOLS}
+
 case "`uname -v`" in
 *Ubuntu*)
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then

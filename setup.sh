@@ -3,16 +3,8 @@
 source RAcross_config.sh
 
 export RACROSS_BASE=`pwd`
-
 export RACROSS_CACHE=${RACROSS_BASE}/cache
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-rm -rf ${RACROSS_CACHE}
-mkdir -p ${RACROSS_CACHE}
-fi
-
 export RACROSS_TOOLS=${HOME}/RAcross-tools
-rm -rf ${RACROSS_TOOLS}
-mkdir -p ${RACROSS_TOOLS}
 
 case "`uname -v`" in
 *Ubuntu*)
