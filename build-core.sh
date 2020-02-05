@@ -100,9 +100,8 @@ if [[ ${LR_SRC_FETCH} = 1 ]] ; then
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
 fi
-./libretro-build-android-mk.sh ${LR_CORE}
+./libretro-build-android-mk.sh ${LR_CORE} 2>&1 | tee log/${LR_CORE}_android.log
 echo "=== android-mk - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_android.log
 
 # CTR
 rm -rf libretro-${LR_CORE}
@@ -164,6 +163,42 @@ fi
 echo "=== libnx - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_libnx.log
 
+# PS2
+rm -rf libretro-${LR_CORE}
+echo "=== PS2 - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-ps2.sh ${LR_CORE}
+echo "=== PS2 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_ps2.log
+
+# PS3
+rm -rf libretro-${LR_CORE}
+echo "=== PS3 - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-ps3.sh ${LR_CORE}
+echo "=== PS3 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_ps3.log
+
+# PS3(sncps3)
+rm -rf libretro-${LR_CORE}
+echo "=== PS3(sncps3) - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-sncps3.sh ${LR_CORE}
+echo "=== PS3(sncps3) - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_sncps3.log
+
 # iOS Theos
 rm -rf libretro-${LR_CORE}
 echo "=== iOS Theos - build start ==="
@@ -175,6 +210,18 @@ fi
 ./libretro-build-ios-theos.sh ${LR_CORE}
 echo "=== iOS Theos - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_ios-theos.log
+
+# Classic
+rm -rf libretro-${LR_CORE}
+echo "=== Classic - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-classic.sh ${LR_CORE}
+echo "=== Classic - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_classic.log
 
 # Emscripten
 source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh

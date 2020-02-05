@@ -6,6 +6,13 @@
 # 4:install from cache(after cache undelete)
 RACROSS_SETUP_TYPE=0
 
+RACROSS_SETUP_GIT=0
+
+if [[ ${RACROSS_SETUP_GIT} = 1 ]] ; then
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+fi
+
 RACROSS_SETUP_CACHE=0
 if [ ${RACROSS_SETUP_TYPE} = 0 ] || [ ${RACROSS_SETUP_TYPE} = 1 ] || [ ${RACROSS_SETUP_TYPE} = 2 ] ; then
 	RACROSS_SETUP_CACHE=1
@@ -18,4 +25,5 @@ RACROSS_SETUP_DELETE=0
 if [ ${RACROSS_SETUP_TYPE} = 0 ] || [ ${RACROSS_SETUP_TYPE} = 3 ] ; then
 	RACROSS_SETUP_DELETE=1
 fi
+
 

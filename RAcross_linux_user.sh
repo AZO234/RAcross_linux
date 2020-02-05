@@ -2,15 +2,16 @@
 
 source RAcross_config.sh
 
+export RACROSS_BASE=`pwd`
+
+export RACROSS_CACHE=${RACROSS_BASE}/cache
 export RACROSS_TOOLS=${HOME}/RAcross-tools
-rm -rf ${RACROSS_TOOLS}
-mkdir -p ${RACROSS_TOOLS}
 
-RACROSS_INITSCRIPT=~/.profile
+RACROSS_INITSCRIPT=${HOME}/.profile
 
-mkdir ~/.ssh
-touch ~/.ssh/known_hosts
-ssh-keyscan github.com >> ~/.ssh/known_hosts
+mkdir ${HOME}/.ssh
+touch ${HOME}/.ssh/known_hosts
+ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
 
 # psptoolchain
 echo "*** setup psptoolchain ***"
@@ -59,7 +60,7 @@ else
 fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	cd libtransistor-base
-	pip3 install -r requirements.txt
+	pip install -r requirements.txt
 	make
 	cp -r dist ../libtransistor/
 	cd ../libtransistor
@@ -77,7 +78,11 @@ fi
 echo "*** setup crosstool-NG ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/AZO234/crosstool-ng
+	git clone --depth=1 https://github.com/crosstool-ng/crosstool-ng.git
+	cd crosstool-ng
+	git remote add AZO234 https://github.com/AZO234/crosstool-ng.git
+	git pull --no-edit AZO234 master
+	cd ..
 	tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf crosstool-ng
@@ -179,9 +184,10 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	echo "export PATH=\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin" >> ${RACROSS_INITSCRIPT}
 fi
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/AZO234/libxenon.git
-	cd crosstool-ng
-	git checkout fix
+	git clone --depth=1 https://github.com/Free60Project/libxenon.git
+	cd libxenon
+	git remote add AZO234 https://github.com/AZO234/libxenon.git
+	git pull --no-edit AZO234 fix
 	cd ..
 	cp ${RACROSS_BASE}/gcc.diff_4.7.4 libxenon/toolchain/
 	tar -Jcf ${RACROSS_CACHE}/libxenon.tar.xz libxenon
@@ -210,9 +216,10 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	echo "export PATH=\$VITASDK/bin:\$PATH" >> ${RACROSS_INITSCRIPT}
 fi
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/AZO234/vdpm
+	git clone --depth=1 https://github.com/vitasdk/vdpm.git
 	cd vdpm
-	git checkout fix
+	git remote add AZO234 https://github.com/AZO234/vdpm.git
+	git pull --no-edit AZO234 fix
 	cd ..
 	tar -Jcf ${RACROSS_CACHE}/vdpm.tar.xz vdpm
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
@@ -235,7 +242,10 @@ fi
 echo "*** setup devkitPro ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/devkitPro/buildscripts.git
+	git clone https://github.com/devkitPro/buildscripts.git
+	cd buildscripts
+	git remote add AZO234 https://github.com/AZO234/buildscripts.git
+	git pull --no-edit AZO234 fix
 	cp ${RACROSS_BASE}/config1.sh buildscripts/
 	cp ${RACROSS_BASE}/config2.sh buildscripts/
 	cp ${RACROSS_BASE}/config3.sh buildscripts/
@@ -265,57 +275,6 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
 		cd ${RACROSS_BASE}
 		rm -rf buildscripts
-	fi
-fi
-
-# ps2toolchain
-echo "*** setup ps2toolchain ***"
-cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/ps2dev/ps2toolchain.git
-	tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
-	git clone --depth=1 https://github.com/ps2dev/ps2sdk-ports.git
-	tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
-	git clone --depth=1 https://github.com/ps2dev/gsKit.git
-	tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
-	git clone --depth=1 https://github.com/ps2dev/ps2-packer.git
-	tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf ps2toolchain
-		rm -rf ps2sdk-ports
-		rm -rf gsKit
-		rm -rf ps2-packer
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/ps2toolchain.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/gsKit.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/ps2-packer.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PS2DEV=${RACROSS_TOOLS}/ps2dev
-	export PS2SDK=$PS2DEV/ps2sdk
-	export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
-	echo "export PS2DEV=${RACROSS_TOOLS}/ps2dev" >> ${RACROSS_INITSCRIPT}
-	echo "export PS2SDK=\$PS2DEV/ps2sdk" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PS2DEV/bin:\$PS2DEV/ee/bin:\$PS2DEV/iop/bin:\$PS2DEV/dvp/bin:\$PS2SDK/bin" >> ${RACROSS_INITSCRIPT}
-	cd ps2toolchain
-	./toolchain.sh
-	cd ${RACROSS_BASE}/ps2sdk-ports
-	make
-	make install
-	cd ${RACROSS_BASE}/gsKit
-	make
-	make install
-	cd ${RACROSS_BASE}/ps2-packer
-	make
-	make install
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf ps2toolchain
-		rm -rf ps2sdk-ports
-		rm -rf gsKit
-		rm -rf ps2-packer
 	fi
 fi
 
@@ -358,20 +317,24 @@ fi
 	cd ${RACROSS_BASE}
 	export THEOS=${RACROSS_TOOLS}/theos
 	echo "export THEOS=${RACROSS_TOOLS}/theos" >> ${RACROSS_INITSCRIPT}
-#	git clone --recursive https://github.com/AZO234/theos.git ${THEOS}
-	git clone https://github.com/AZO234/theos.git ${THEOS}
+	git clone https://github.com/theos/theos.git ${THEOS}
 	cd ${THEOS}
-	git checkout fix
+	git remote add AZO234 https://github.com/AZO234/theos.git
+	git pull --no-edit AZO234 fix
 	git submodule update --init --recursive
 	cd ${RACROSS_BASE}
+	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
+	tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
 	rm -rf ${THEOS}/sdks
 	git clone --depth=1 https://github.com/theos/sdks.git ${THEOS}/sdks
+	curl https://kabiroberai.com/toolchain/download.php?toolchain=swift-ubuntu-latest -Lo swift-toolchain.tar.gz
+	tar -xzf swift-toolchain.tar.gz -C ${THEOS}/toolchain
 #	curl https://ghostbin.com/ghost.sh -o ${THEOS}/bin/ghost
 	curl https://gist.githubusercontent.com/supermamon/e5d7d19286f7fb471c85d0b1127d5e47/raw/a57b0f8cf7864e53169bb5290ce56be2c7631403/ghost.sh -o ${THEOS}/bin/ghost
 	chmod +x ${THEOS}/bin/ghost
-#	if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-#		tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
-#	fi
+	if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
+		tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
+	fi
 
 # Emscripten
 echo "*** setup Emscripten ***"
@@ -401,23 +364,24 @@ fi
 echo "*** setup Android NDK ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	wget https://dl.google.com/android/repository/android-ndk-r20-linux-x86_64.zip -P ${RACROSS_CACHE}
+	wget https://dl.google.com/android/repository/android-ndk-r20b-linux-x86_64.zip -P ${RACROSS_CACHE}
 fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	unzip ${RACROSS_CACHE}/android-ndk-r20-linux-x86_64.zip -d ${RACROSS_TOOLS}/
-	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20
-	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r20
-	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r20" >> ${RACROSS_INITSCRIPT}
+	unzip ${RACROSS_CACHE}/android-ndk-r20b-linux-x86_64.zip -d ${RACROSS_TOOLS}/
+	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20b
+	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r20b
+	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r20b" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r20b" >> ${RACROSS_INITSCRIPT}
 fi
 
 # libretro-super
 echo "*** setup libretro-super ***"
 cd ~
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/AZO234/libretro-super.git
+	git clone https://github.com/libretro/libretro-super.git
 	cd libretro-super
-	git checkout AZO_fix
+	git remote add AZO234 https://github.com/AZO234/libretro-super.git
+	git pull --no-edit AZO234 AZO_fix
 	cd ..
 	tar -Jcf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
