@@ -187,17 +187,17 @@ fi
 echo "=== iOS Theos - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_ios-theos.log
 
-## Classic
-#rm -rf libretro-${LR_CORE}
-#echo "=== Classic - build start ==="
-#if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-#./libretro-fetch.sh ${LR_CORE}
-#else
-#cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-#fi
-#./libretro-build-classic.sh ${LR_CORE}
-#echo "=== Classic - build end ==="
-#mv log/${LR_CORE}.log log/${LR_CORE}_classic.log
+# Classic
+rm -rf libretro-${LR_CORE}
+echo "=== Classic - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-classic_armv7_a7.sh ${LR_CORE}
+echo "=== Classic - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_classic_armv7_a7.log
 
 # Emscripten
 source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh
