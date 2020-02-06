@@ -2,10 +2,6 @@
 
 source RAcross_config.sh
 
-export RACROSS_BASE=`pwd`
-export RACROSS_CACHE=${RACROSS_BASE}/cache
-export RACROSS_TOOLS=${HOME}/RAcross-tools
-
 case "`uname -v`" in
 *Ubuntu*)
 sudo ./RAcross_linux_su.sh

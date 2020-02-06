@@ -13,6 +13,57 @@ mkdir ${HOME}/.ssh
 touch ${HOME}/.ssh/known_hosts
 ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
 
+# ps2toolchain
+echo "*** setup ps2toolchain ***"
+cd ${RACROSS_BASE}
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git clone --depth=1 https://github.com/ps2dev/ps2toolchain.git
+	tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
+	git clone --depth=1 https://github.com/ps2dev/ps2sdk-ports.git
+	tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
+	git clone --depth=1 https://github.com/ps2dev/gsKit.git
+	tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
+	git clone --depth=1 https://github.com/ps2dev/ps2-packer.git
+	tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
+	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
+		rm -rf ps2toolchain
+		rm -rf ps2sdk-ports
+		rm -rf gsKit
+		rm -rf ps2-packer
+	fi
+else
+	tar -Jxf ${RACROSS_CACHE}/ps2toolchain.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/gsKit.tar.xz
+	tar -Jxf ${RACROSS_CACHE}/ps2-packer.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	export PS2DEV=${RACROSS_TOOLS}/ps2dev
+	export PS2SDK=$PS2DEV/ps2sdk
+	export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
+	echo "export PS2DEV=${RACROSS_TOOLS}/ps2dev" >> ${RACROSS_INITSCRIPT}
+	echo "export PS2SDK=\$PS2DEV/ps2sdk" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:\$PS2DEV/bin:\$PS2DEV/ee/bin:\$PS2DEV/iop/bin:\$PS2DEV/dvp/bin:\$PS2SDK/bin" >> ${RACROSS_INITSCRIPT}
+	cd ps2toolchain
+	./toolchain.sh
+	cd ${RACROSS_BASE}/ps2sdk-ports
+	make
+	make install
+	cd ${RACROSS_BASE}/gsKit
+	make
+	make install
+	cd ${RACROSS_BASE}/ps2-packer
+	make
+	make install
+	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
+		cd ${RACROSS_BASE}
+		rm -rf ps2toolchain
+		rm -rf ps2sdk-ports
+		rm -rf gsKit
+		rm -rf ps2-packer
+	fi
+fi
+
 # psptoolchain
 echo "*** setup psptoolchain ***"
 cd ${RACROSS_BASE}

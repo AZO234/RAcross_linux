@@ -1,3 +1,11 @@
+export RACROSS_BASE=`pwd`
+export RACROSS_CACHE=${RACROSS_BASE}/cache
+if [ "`whoami`" != "root" ]; then
+export RACROSS_TOOLS=/home/${USER}/RAcross-tools
+else
+export RACROSS_TOOLS=/home/${SUDO_USER}/RAcross-tools
+fi
+
 # SETUP_TYPE
 # 0:install(after delete cache)
 # 1:install(after cache undelete)
