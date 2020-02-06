@@ -1,0 +1,27 @@
+-- The CXX compiler identification is Clang 9.0.0
+-- The C compiler identification is Clang 9.0.0
+-- Check for working CXX compiler: /usr/lib/llvm-9/bin/clang++
+-- Check for working CXX compiler: /usr/lib/llvm-9/bin/clang++ -- broken
+CMake Error at /usr/share/cmake-3.13/Modules/CMakeTestCXXCompiler.cmake:45 (message):
+  The C++ compiler
+
+    "/usr/lib/llvm-9/bin/clang++"
+
+  is not able to compile a simple test program.
+
+  It fails with the following output:
+
+    Change Dir: /home/azo/RAcross_linux/libtransistor-base/build/libcxx/CMakeFiles/CMakeTmp
+    
+    Run Build Command:"/usr/bin/make" "cmTC_b88ad/fast"
+
+
+/usr/lib/llvm-9/bin/clang++ -isystem /home/azo/RAcross_linux/libtransistor/dist/include/c++/v1/ -g -fPIC -fexceptions -fuse-ld=lld -fstack-protector-strong -O3 -mtune=cortex-a53 -target aarch64-none-linux-gnu -nostdlib -nostdlibinc -isystem /home/azo/RAcross_linux/libtransistor/dist/include/ -D__SWITCH__=1 -Wno-unused-command-line-argument -std=c++17 -stdlib=libc++ -nodefaultlibs -nostdinc++ -I./include/ -Wall -Wextra -Werror-implicit-function-declaration -Wno-unused-parameter -Wno-unused-command-line-argument -Werror-thread-safety -Werror-return-type -Werror-overloaded-virtual -MMD -MP -c -o ./build//transistor/cpp/ipcclient.o lib/cpp/ipcclient.cpp
+In file included from lib/cpp/ipcclient.cpp:1:
+In file included from ./include/libtransistor/cpp/ipcclient.hpp:8:
+In file included from ./include/libtransistor/cpp/types.hpp:5:
+/home/azo/RAcross_linux/libtransistor/dist/include/expected.hpp:20:10: fatal error: 'exception' file not found
+#include <exception>
+         ^~~~~~~~~~~
+1 error generated.
+

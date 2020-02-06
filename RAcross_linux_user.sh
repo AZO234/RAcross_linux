@@ -9,6 +9,13 @@ export RACROSS_TOOLS=${HOME}/RAcross-tools
 
 RACROSS_INITSCRIPT=${HOME}/.profile
 
+RACROSS_SETUP_GIT=0
+
+if [[ ${RACROSS_SETUP_GIT} = 1 ]] ; then
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+fi
+
 mkdir ${HOME}/.ssh
 touch ${HOME}/.ssh/known_hosts
 ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
