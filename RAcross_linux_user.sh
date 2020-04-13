@@ -24,13 +24,13 @@ ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
 echo "*** setup ps2toolchain ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/ps2dev/ps2toolchain.git
+	git clone https://github.com/ps2dev/ps2toolchain.git
 	tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
-	git clone --depth=1 https://github.com/ps2dev/ps2sdk-ports.git
+	git clone https://github.com/ps2dev/ps2sdk-ports.git
 	tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
-	git clone --depth=1 https://github.com/ps2dev/gsKit.git
+	git clone https://github.com/ps2dev/gsKit.git
 	tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
-	git clone --depth=1 https://github.com/ps2dev/ps2-packer.git
+	git clone https://github.com/ps2dev/ps2-packer.git
 	tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf ps2toolchain
@@ -75,7 +75,7 @@ fi
 echo "*** setup psptoolchain ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/pspdev/psptoolchain.git
+	git clone https://github.com/pspdev/psptoolchain.git
 	tar -Jcf ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf psptoolchain
@@ -136,10 +136,10 @@ fi
 echo "*** setup crosstool-NG ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/crosstool-ng/crosstool-ng.git
+	git clone https://github.com/crosstool-ng/crosstool-ng.git
 	cd crosstool-ng
 	git remote add AZO234 https://github.com/AZO234/crosstool-ng.git
-	git pull --no-edit AZO234 master
+	git pull --no-edit AZO234 fix
 	cd ..
 	tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
@@ -242,7 +242,7 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	echo "export PATH=\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin" >> ${RACROSS_INITSCRIPT}
 fi
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/Free60Project/libxenon.git
+	git clone https://github.com/Free60Project/libxenon.git
 	cd libxenon
 	git remote add AZO234 https://github.com/AZO234/libxenon.git
 	git pull --no-edit AZO234 fix
@@ -274,7 +274,7 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	echo "export PATH=\$VITASDK/bin:\$PATH" >> ${RACROSS_INITSCRIPT}
 fi
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/vitasdk/vdpm.git
+	git clone https://github.com/vitasdk/vdpm.git
 	cd vdpm
 	git remote add AZO234 https://github.com/AZO234/vdpm.git
 	git pull --no-edit AZO234 fix
@@ -342,7 +342,7 @@ echo "*** setup ps3toolchain ***"
 mkdir -p ${RACROSS_TOOLS}/ps3dev
 cd ${RACROSS_TOOLS}/ps3dev
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/ps3dev/ps3toolchain.git
+	git clone https://github.com/ps3dev/ps3toolchain.git
 	tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf ps3toolchain
@@ -385,7 +385,7 @@ fi
 	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
 	tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
 	rm -rf ${THEOS}/sdks
-	git clone --depth=1 https://github.com/theos/sdks.git ${THEOS}/sdks
+	git clone https://github.com/theos/sdks.git ${THEOS}/sdks
 	curl https://kabiroberai.com/toolchain/download.php?toolchain=swift-ubuntu-latest -Lo swift-toolchain.tar.gz
 	tar -xzf swift-toolchain.tar.gz -C ${THEOS}/toolchain
 #	curl https://ghostbin.com/ghost.sh -o ${THEOS}/bin/ghost
@@ -399,7 +399,7 @@ fi
 echo "*** setup Emscripten ***"
 cd ${RACROSS_TOOLS}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/emscripten-core/emsdk.git
+	git clone https://github.com/emscripten-core/emsdk.git
 	cd emsdk
 	./emsdk update
 	git pull
