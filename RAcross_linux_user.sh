@@ -331,6 +331,7 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	./build-devkit.sh
 	cp config3.sh config.sh
 	./build-devkit.sh
+	patch ${DEVKITA64}/base_tools < ${RACROSS_BASE}/devkitA64_base_tools.patch
 	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
 		cd ${RACROSS_BASE}
 		rm -rf buildscripts
@@ -385,12 +386,11 @@ fi
 	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
 	tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
 	rm -rf ${THEOS}/sdks
-	git clone https://github.com/theos/sdks.git ${THEOS}/sdks
-	curl https://kabiroberai.com/toolchain/download.php?toolchain=swift-ubuntu-latest -Lo swift-toolchain.tar.gz
-	tar -xzf swift-toolchain.tar.gz -C ${THEOS}/toolchain
-#	curl https://ghostbin.com/ghost.sh -o ${THEOS}/bin/ghost
-	curl https://gist.githubusercontent.com/supermamon/e5d7d19286f7fb471c85d0b1127d5e47/raw/a57b0f8cf7864e53169bb5290ce56be2c7631403/ghost.sh -o ${THEOS}/bin/ghost
-	chmod +x ${THEOS}/bin/ghost
+	git clone https://github.com/hirakujira/sdks.git ${THEOS}/sdks
+	curl https://swift.org/builds/swift-5.2.1-release/ubuntu1804/swift-5.2.1-RELEASE/swift-5.2.1-RELEASE-ubuntu18.04.tar.gz -Lo swift-toolchain.tar.gz
+	tar -xzf swift-5.2.1-RELEASE-ubuntu18.04.tar.gz
+	mkdir ${THEOS}/sdks/swift
+	mv swift-5.2.1-RELEASE-ubuntu18.04/usr/* ${THEOS}/sdks/swift
 	if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
 		tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
 	fi
