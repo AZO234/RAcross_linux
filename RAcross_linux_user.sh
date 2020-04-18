@@ -340,10 +340,9 @@ fi
 
 # ps3toolchain
 echo "*** setup ps3toolchain ***"
-mkdir -p ${RACROSS_TOOLS}/ps3dev
-cd ${RACROSS_TOOLS}/ps3dev
+cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/scrapes/ps3toolchain-minimal.git ps3toolchain
+	git clone https://github.com/ps3dev/ps3toolchain.git
 	tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf ps3toolchain
@@ -353,11 +352,10 @@ else
 fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	export PS3DEV=${RACROSS_TOOLS}/ps3dev
+	export PSL1GHT=${PS3DEV}/psl1ght
 	export PATH=$PATH:$PS3DEV/bin
 	export PATH=$PATH:$PS3DEV/ppu/bin
 	export PATH=$PATH:$PS3DEV/spu/bin
-	export PSL1GHT=$PS3DEV/psl1ght
-	export PATH=$PATH:$PSL1GHT/host/bin
 	echo "export PS3DEV=${RACROSS_TOOLS}/ps3dev" >> ${RACROSS_INITSCRIPT}
 	echo "export PATH=\$PATH:\$PS3DEV/bin" >> ${RACROSS_INITSCRIPT}
 	echo "export PATH=\$PATH:\$PS3DEV/ppu/bin" >> ${RACROSS_INITSCRIPT}
@@ -372,10 +370,10 @@ fi
 
 # PSL1GHT
 echo "*** setup PSL1GHT ***"
-mkdir -p ${RACROSS_TOOLS}/PSL1GHT
-cd ${RACROSS_TOOLS}/PSL1GHT
+rm -rf ${PSL1GHT}
+cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git https://github.com/bucanero/PSL1GHT.git
+	git clone https://github.com/bucanero/PSL1GHT.git
 	tar -Jcf ${RACROSS_CACHE}/PSL1GHT.tar.xz PSL1GHT
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf PSL1GHT
@@ -384,9 +382,8 @@ else
 	tar -Jxf ${RACROSS_CACHE}/PSL1GHT.tar.xz
 fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PSL1GHT=${RACROSS_TOOLS}/PSL1GHT
 	export PATH=$PATH:$PSL1GHT/host/bin
-	echo "export PSL1GHT=${RACROSS_TOOLS}/PSL1GHT" >> ${RACROSS_INITSCRIPT}
+	echo "export PSL1GHT=${PSL1GHT}" >> ${RACROSS_INITSCRIPT}
 	echo "export PATH=\$PATH:\$PSL1GHT/host/bin" >> ${RACROSS_INITSCRIPT}
 	cd PSL1GHT
 	make install-ctrl
