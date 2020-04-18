@@ -343,7 +343,7 @@ echo "*** setup ps3toolchain ***"
 mkdir -p ${RACROSS_TOOLS}/ps3dev
 cd ${RACROSS_TOOLS}/ps3dev
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/ps3dev/ps3toolchain.git
+	git clone https://github.com/scrapes/ps3toolchain-minimal.git ps3toolchain
 	tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
 	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
 		rm -rf ps3toolchain
@@ -362,8 +362,6 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	echo "export PATH=\$PATH:\$PS3DEV/bin" >> ${RACROSS_INITSCRIPT}
 	echo "export PATH=\$PATH:\$PS3DEV/ppu/bin" >> ${RACROSS_INITSCRIPT}
 	echo "export PATH=\$PATH:\$PS3DEV/spu/bin" >> ${RACROSS_INITSCRIPT}
-	echo "export PSL1GHT=\$PS3DEV/psl1ght" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PSL1GHT/host/bin" >> ${RACROSS_INITSCRIPT}
 	cd ps3toolchain
 	./toolchain.sh
 	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
@@ -372,28 +370,56 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	fi
 fi
 
-# Theos
-	echo "*** setup Theos ***"
-	cd ${RACROSS_BASE}
-	export THEOS=${RACROSS_TOOLS}/theos
-	echo "export THEOS=${RACROSS_TOOLS}/theos" >> ${RACROSS_INITSCRIPT}
-	git clone https://github.com/theos/theos.git ${THEOS}
-	cd ${THEOS}
-	git remote add AZO234 https://github.com/AZO234/theos.git
-	git pull --no-edit AZO234 fix
-	git submodule update --init --recursive
-	cd ${RACROSS_BASE}
-	curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
-	tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
-	rm -rf ${THEOS}/sdks
-	git clone https://github.com/hirakujira/sdks.git ${THEOS}/sdks
-	curl https://swift.org/builds/swift-5.2.1-release/ubuntu1804/swift-5.2.1-RELEASE/swift-5.2.1-RELEASE-ubuntu18.04.tar.gz -Lo swift-toolchain.tar.gz
-	tar -xzf swift-5.2.1-RELEASE-ubuntu18.04.tar.gz
-	mkdir ${THEOS}/sdks/swift
-	mv swift-5.2.1-RELEASE-ubuntu18.04/usr/* ${THEOS}/sdks/swift
-	if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
+# PSL1GHT
+echo "*** setup PSL1GHT ***"
+mkdir -p ${RACROSS_TOOLS}/PSL1GHT
+cd ${RACROSS_TOOLS}/PSL1GHT
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git https://github.com/bucanero/PSL1GHT.git
+	tar -Jcf ${RACROSS_CACHE}/PSL1GHT.tar.xz PSL1GHT
+	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
+		rm -rf PSL1GHT
 	fi
+else
+	tar -Jxf ${RACROSS_CACHE}/PSL1GHT.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	export PSL1GHT=${RACROSS_TOOLS}/PSL1GHT
+	export PATH=$PATH:$PSL1GHT/host/bin
+	echo "export PSL1GHT=${RACROSS_TOOLS}/PSL1GHT" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:\$PSL1GHT/host/bin" >> ${RACROSS_INITSCRIPT}
+	cd PSL1GHT
+	make install-ctrl
+	make
+	make install
+	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
+		cd ${RACROSS_BASE}
+		rm -rf PSL1GHT
+	fi
+fi
+
+# Theos
+echo "*** setup Theos ***"
+cd ${RACROSS_BASE}
+export THEOS=${RACROSS_TOOLS}/theos
+echo "export THEOS=${RACROSS_TOOLS}/theos" >> ${RACROSS_INITSCRIPT}
+git clone https://github.com/theos/theos.git ${THEOS}
+cd ${THEOS}
+git remote add AZO234 https://github.com/AZO234/theos.git
+git pull --no-edit AZO234 fix
+git submodule update --init --recursive
+cd ${RACROSS_BASE}
+curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
+tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
+rm -rf ${THEOS}/sdks
+git clone https://github.com/hirakujira/sdks.git ${THEOS}/sdks
+curl https://swift.org/builds/swift-5.2.1-release/ubuntu1804/swift-5.2.1-RELEASE/swift-5.2.1-RELEASE-ubuntu18.04.tar.gz -Lo swift-toolchain.tar.gz
+tar -xzf swift-5.2.1-RELEASE-ubuntu18.04.tar.gz
+mkdir ${THEOS}/sdks/swift
+mv swift-5.2.1-RELEASE-ubuntu18.04/usr/* ${THEOS}/sdks/swift
+if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
+	tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
+fi
 
 # Emscripten
 echo "*** setup Emscripten ***"
