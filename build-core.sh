@@ -175,6 +175,18 @@ fi
 echo "=== PS3 - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_ps3.log
 
+# PSL1GHT
+rm -rf libretro-${LR_CORE}
+echo "=== PSL1GHT - build start ==="
+if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-psl1ght.sh ${LR_CORE}
+echo "=== PSL1GHT - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_psl1ght.log
+
 # iOS Theos
 rm -rf libretro-${LR_CORE}
 echo "=== iOS Theos - build start ==="
