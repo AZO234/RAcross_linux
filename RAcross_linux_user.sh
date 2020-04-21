@@ -442,6 +442,31 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 #	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
 fi
 
+# OpenDingux GCW0
+echo "*** OpenDingux GCW0 ***"
+cd ${RACROSS_TOOLS}
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git clone https://github.com/OpenDingux/buildroot.git
+	tar -Jcf ${RACROSS_CACHE}/buildroot.tar.xz buildroot
+	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
+		rm -rf buildroot
+	fi
+else
+	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	cd buildroot
+	CONFIG=gcw0 FORCE_UNSAFE_CONFIGURE=1 ./rebuild.sh
+fi
+
+# OpenDingux RS90
+echo "*** OpenDingux RS90 ***"
+cd ${RACROSS_TOOLS}
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	cd buildroot
+	CONFIG=rs90 FORCE_UNSAFE_CONFIGURE=1 ./rebuild.sh
+fi
+
 # Android NDK
 echo "*** setup Android NDK ***"
 cd ${RACROSS_BASE}
