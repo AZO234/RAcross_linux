@@ -9,7 +9,7 @@ export RACROSS_TOOLS=${HOME}/RAcross-tools
 
 RACROSS_INITSCRIPT=${HOME}/.profile
 
-RACROSS_SETUP_GIT=0
+RACROSS_SETUP_GIT=1
 
 if [[ ${RACROSS_SETUP_GIT} = 1 ]] ; then
 git config --global user.email "you@example.com"
@@ -19,6 +19,66 @@ fi
 mkdir ${HOME}/.ssh
 touch ${HOME}/.ssh/known_hosts
 ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
+
+# OpenDigux GCW0 toolchain (and tools)
+echo "*** setup OpenDigux GCW0 toolchain ***"
+cd ${RACROSS_BASE}
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git clone --depth=1 https://github.com/OpenDingux/buildroot.git
+	tar -Jcf ${RACROSS_CACHE}/buildroot.tar.xz buildroot
+else
+	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	mv buildroot GCW0_buildroot
+	cd GCW0_buildroot
+	make od_gcw0_defconfig
+	make toolchain
+#	mv output/host /opt/gcw0-toolchain
+	cd ..
+	mv GCW0_buildroot ${RACROSS_TOOLS}/
+fi
+
+# OpenDigux RS90 toolchain (and tools)
+echo "*** setup OpenDigux RS90 toolchain ***"
+cd ${RACROSS_BASE}
+rm -rf buildroot
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git clone --depth=1 https://github.com/OpenDingux/buildroot.git
+else
+	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	mv buildroot RS90_buildroot
+	cd RS90_buildroot
+	make od_rs90_defconfig
+	make toolchain
+#	mv output/host /opt/rs90-toolchain
+	cd ..
+	mv RS90_buildroot ${RACROSS_TOOLS}/
+fi
+
+# OpenDigux RG350 toolchain (and tools)
+echo "*** setup OpenDigux RG350 toolchain ***"
+cd ${RACROSS_BASE}
+if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
+	git clone --depth=1 https://github.com/tonyjih/RG350_buildroot.git
+	tar -Jcf ${RACROSS_CACHE}/RG350_buildroot.tar.xz RG350_buildroot
+else
+	tar -Jxf ${RACROSS_CACHE}/RG350_buildroot.tar.xz
+fi
+if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
+	cd RG350_buildroot
+	make rg350_defconfig BR2_EXTERNAL=board/opendingux
+	export BR2_JLEVEL=0
+	make toolchain
+	make sdl sdl_image
+	board/opendingux/gcw0/download_local_pack.sh
+#	board/opendingux/gcw0/make_initial_image.sh
+#	mv output/host /opt/rg350-toolchain
+	cd ..
+	mv RG350_buildroot ${RACROSS_TOOLS}/
+fi
 
 # ps2toolchain
 echo "*** setup ps2toolchain ***"
@@ -411,7 +471,7 @@ tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
 rm -rf ${THEOS}/sdks
 git clone https://github.com/hirakujira/sdks.git ${THEOS}/sdks
 curl https://swift.org/builds/swift-5.2.1-release/ubuntu1804/swift-5.2.1-RELEASE/swift-5.2.1-RELEASE-ubuntu18.04.tar.gz -Lo swift-toolchain.tar.gz
-tar -xzf swift-5.2.1-RELEASE-ubuntu18.04.tar.gz
+tar -zxf swift-toolchain.tar.gz
 mkdir ${THEOS}/sdks/swift
 mv swift-5.2.1-RELEASE-ubuntu18.04/usr/* ${THEOS}/sdks/swift
 if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
@@ -438,33 +498,8 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	cd emsdk
 	./emsdk install latest
 	./emsdk activate latest
-#	source ./emsdk_env.sh
-#	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
-fi
-
-# OpenDingux GCW0
-echo "*** OpenDingux GCW0 ***"
-cd ${RACROSS_TOOLS}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/OpenDingux/buildroot.git
-	tar -Jcf ${RACROSS_CACHE}/buildroot.tar.xz buildroot
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf buildroot
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd buildroot
-	CONFIG=gcw0 FORCE_UNSAFE_CONFIGURE=1 ./rebuild.sh
-fi
-
-# OpenDingux RS90
-echo "*** OpenDingux RS90 ***"
-cd ${RACROSS_TOOLS}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd buildroot
-	CONFIG=rs90 FORCE_UNSAFE_CONFIGURE=1 ./rebuild.sh
+	./emsdk_env.sh
+	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
 fi
 
 # Android NDK

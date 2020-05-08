@@ -3,7 +3,7 @@ RAcross_linux
 
 RAcross is libretro(RA?)'s core cross build emvironment.
 
-	- Use Ubuntu 19.10 (Vanilla)
+	- Use Ubuntu 20.04 (Vanilla)
 
 RAcross_linux can test follow cross builds
 
@@ -20,6 +20,10 @@ RAcross_linux can test follow cross builds
 	- WiiU
 	- libnx
 	- Emscripten
+	- OpenDingux
+		- GCW0
+		- RS90
+		- RG350
 	- RPi2
 	- RPi3
 	- RPi4
