@@ -33,8 +33,8 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	mv buildroot GCW0_buildroot
 	cd GCW0_buildroot
 	make od_gcw0_defconfig
-	make toolchain
-#	mv output/host /opt/gcw0-toolchain
+	export BR2_JLEVEL=0
+	make
 	cd ..
 	mv GCW0_buildroot ${RACROSS_TOOLS}/
 fi
@@ -52,8 +52,7 @@ if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	mv buildroot RS90_buildroot
 	cd RS90_buildroot
 	make od_rs90_defconfig
-	make toolchain
-#	mv output/host /opt/rs90-toolchain
+	make
 	cd ..
 	mv RS90_buildroot ${RACROSS_TOOLS}/
 fi
@@ -63,6 +62,7 @@ echo "*** setup OpenDigux RG350 toolchain ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
 	git clone --depth=1 https://github.com/tonyjih/RG350_buildroot.git
+	patch -p1 -d RG350_buildroot < ${RACROSS_BASE}/RG350_buildroot.patch
 	tar -Jcf ${RACROSS_CACHE}/RG350_buildroot.tar.xz RG350_buildroot
 else
 	tar -Jxf ${RACROSS_CACHE}/RG350_buildroot.tar.xz
@@ -70,12 +70,7 @@ fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	cd RG350_buildroot
 	make rg350_defconfig BR2_EXTERNAL=board/opendingux
-	export BR2_JLEVEL=0
-	make toolchain
-	make sdl sdl_image
-	board/opendingux/gcw0/download_local_pack.sh
-#	board/opendingux/gcw0/make_initial_image.sh
-#	mv output/host /opt/rg350-toolchain
+	./rebuld.sh
 	cd ..
 	mv RG350_buildroot ${RACROSS_TOOLS}/
 fi
