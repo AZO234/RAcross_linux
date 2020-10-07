@@ -70,7 +70,7 @@ fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
 	cd RG350_buildroot
 	make rg350_defconfig BR2_EXTERNAL=board/opendingux
-	./rebuld.sh
+	./rebuild.sh
 	cd ..
 	mv RG350_buildroot ${RACROSS_TOOLS}/
 fi
@@ -501,14 +501,14 @@ fi
 echo "*** setup Android NDK ***"
 cd ${RACROSS_BASE}
 if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	wget https://dl.google.com/android/repository/android-ndk-r21-linux-x86_64.zip -P ${RACROSS_CACHE}
+	wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip -P ${RACROSS_CACHE}
 fi
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	unzip ${RACROSS_CACHE}/android-ndk-r21-linux-x86_64.zip -d ${RACROSS_TOOLS}/
-	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21
-	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r21
-	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r21" >> ${RACROSS_INITSCRIPT}
+	unzip ${RACROSS_CACHE}/android-ndk-r21b-linux-x86_64.zip -d ${RACROSS_TOOLS}/
+	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21b
+	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r21b
+	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21b" >> ${RACROSS_INITSCRIPT}
+	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r21b" >> ${RACROSS_INITSCRIPT}
 fi
 
 # libretro-super
@@ -530,6 +530,6 @@ fi
 
 # build scripts
 if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cp ${RACROSS_BASE}/build-core.sh ~/libretro-super
+	cp ${RACROSS_BASE}/build-core.sh ~/libretro-super/
 fi
 

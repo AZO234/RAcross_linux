@@ -1,7 +1,7 @@
 バイナリーファイル RG350_buildroot_org/.git/index とRG350_buildroot/.git/index は異なります
 diff -uprN RG350_buildroot_org/board/opendingux/gcw0/post-build-script.sh RG350_buildroot/board/opendingux/gcw0/post-build-script.sh
---- RG350_buildroot_org/board/opendingux/gcw0/post-build-script.sh	2020-05-14 18:42:03.848975000 +0900
-+++ RG350_buildroot/board/opendingux/gcw0/post-build-script.sh	2020-05-14 18:45:39.144231109 +0900
+--- RG350_buildroot_org/board/opendingux/gcw0/post-build-script.sh	2020-05-20 16:28:16.376516000 +0900
++++ RG350_buildroot/board/opendingux/gcw0/post-build-script.sh	2020-05-20 16:29:21.444307600 +0900
 @@ -6,7 +6,7 @@ TARGET_DIR=$1
  for i in ar as ld ld.bfd nm objcopy ranlib strip ; do
  	rm -f ${TARGET_DIR}/usr/bin/$i
@@ -12,8 +12,8 @@ diff -uprN RG350_buildroot_org/board/opendingux/gcw0/post-build-script.sh RG350_
  # We use xinetd, so no need for a startup script for the SSH daemons
  # and the FTP server.
 diff -uprN RG350_buildroot_org/board/opendingux/gcw0/uclibc.config RG350_buildroot/board/opendingux/gcw0/uclibc.config
---- RG350_buildroot_org/board/opendingux/gcw0/uclibc.config	2020-05-14 18:42:03.848975000 +0900
-+++ RG350_buildroot/board/opendingux/gcw0/uclibc.config	2020-05-14 18:48:07.115728973 +0900
+--- RG350_buildroot_org/board/opendingux/gcw0/uclibc.config	2020-05-20 16:28:16.380516000 +0900
++++ RG350_buildroot/board/opendingux/gcw0/uclibc.config	2020-05-20 16:29:21.444307600 +0900
 @@ -61,7 +61,7 @@ UCLIBC_HAS_FPU=y
  DO_C99_MATH=y
  # DO_XSI_MATH is not set
@@ -33,8 +33,8 @@ diff -uprN RG350_buildroot_org/board/opendingux/gcw0/uclibc.config RG350_buildro
  # DODEBUG is not set
  DOSTRIP=y
 diff -uprN RG350_buildroot_org/configs/rg350_defconfig RG350_buildroot/configs/rg350_defconfig
---- RG350_buildroot_org/configs/rg350_defconfig	2020-05-14 18:42:03.864975000 +0900
-+++ RG350_buildroot/configs/rg350_defconfig	2020-05-14 18:55:53.662118330 +0900
+--- RG350_buildroot_org/configs/rg350_defconfig	2020-05-20 16:28:16.396516000 +0900
++++ RG350_buildroot/configs/rg350_defconfig	2020-05-20 16:29:21.444307600 +0900
 @@ -2,7 +2,7 @@ BR2_mipsel=y
  BR2_mips_xburst=y
  # BR2_MIPS_SOFT_FLOAT is not set
@@ -45,9 +45,9 @@ diff -uprN RG350_buildroot_org/configs/rg350_defconfig RG350_buildroot/configs/r
  BR2_UCLIBC_CONFIG="board/opendingux/gcw0/uclibc.config"
  BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
 diff -uprN RG350_buildroot_org/rebuild.sh RG350_buildroot/rebuild.sh
---- RG350_buildroot_org/rebuild.sh	2020-05-14 18:42:03.996975000 +0900
-+++ RG350_buildroot/rebuild.sh	2020-05-15 03:31:35.983394210 +0900
-@@ -3,15 +3,15 @@ set -e
+--- RG350_buildroot_org/rebuild.sh	2020-05-20 16:28:16.520516000 +0900
++++ RG350_buildroot/rebuild.sh	2020-05-20 23:35:06.156526355 +0900
+@@ -3,15 +3,14 @@ set -e
  
  # Get the latest version.
  echo "Updating local git repository..."
@@ -57,17 +57,22 @@ diff -uprN RG350_buildroot_org/rebuild.sh RG350_buildroot/rebuild.sh
  # Use the default config and patch it to point to our install location.
 -make gcw0_defconfig
 -sed -ie 's%^BR2_HOST_DIR=.*$%BR2_HOST_DIR="/opt/gcw0-toolchain"%' .config
-+make rg350_defconfig
-+sed -ie 's%^BR2_HOST_DIR=.*$%BR2_HOST_DIR="/opt/rg350-toolchain"%' .config
++#make rg350_defconfig
  
  # Clear the install location.
  echo "Clearing install location..."
 -rm -rf /opt/gcw0-toolchain/*
-+rm -rf /opt/rg350-toolchain/*
++#rm -rf /opt/rg350-toolchain/*
  
  # Clear the build location.
  echo "Clearing build location..."
-@@ -39,4 +39,4 @@ nice make BR2_EXTERNAL=board/opendingux
+@@ -35,8 +34,10 @@ rm -f dl/sdl2-*.tar.gz
+ 
+ # Perform the build.
+ echo "Starting build..."
++make rg350_defconfig BR2_EXTERNAL=board/opendingux
++sed -ie 's%^BR2_HOST_DIR=.*$%BR2_HOST_DIR="/opt/rg350-toolchain"%' .config
+ nice make BR2_EXTERNAL=board/opendingux
  
  # Create packages.
  echo "Creating packages..."
