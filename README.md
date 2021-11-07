@@ -3,30 +3,27 @@ RAcross_linux
 
 RAcross is libretro(RA?)'s core cross build emvironment.
 
-	- Use Ubuntu 20.04 (Vanilla)
+	- Use Ubuntu 21.10 (Vanilla)
 
 RAcross_linux can test follow cross builds
 
 	- PSP
-	- psl1ght
 	- Xenon
 	- Vita
-	- Vita
-	- Switch(libtransistor)
 	- Android
+	- libnx
+	- Emscripten
+	- RPi2
+	- RPi3 32/64bit
+	- RPi4 32/64bit
+
+maintenancing:
+	- psl1ght
+	- Switch(libtransistor)
 	- CTR(3DS)
 	- NGC
 	- Wii
 	- WiiU
-	- libnx
-	- Emscripten
-	- OpenDingux
-		- GCW0
-		- RS90
-		- RG350
-	- RPi2
-	- RPi3
-	- RPi4
 
 install
 -------
@@ -43,7 +40,6 @@ install
 		- crosstool-NG
 			- RPi2
 			- RPi3
-			- RPi4
 		- Xenon_Toolchain
 		- Vita SDK
 		- devkitPro
@@ -63,6 +59,5 @@ usage
 	3. edit libretro-super/build-core.sh, LR_CORE and LR_CORE_SRC value
 	4. cd libretro-super
 	5. ./build-core.sh
-	6. build logs are output in 'log' dir  
-	binalys are output in 'dist' dir
+	6. build logs are output in log dir
 

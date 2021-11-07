@@ -1,0 +1,50 @@
+diff -uprN buildscripts/build-devkit.sh buildscripts_/build-devkit.sh
+--- buildscripts/build-devkit.sh	2021-11-07 16:45:12.502925283 +0900
++++ buildscripts_/build-devkit.sh	2021-11-07 16:48:35.314467120 +0900
+@@ -76,14 +76,15 @@ fi
+ #---------------------------------------------------------------------------------
+ 
+ if [ ! -z "$BUILD_DKPRO_INSTALLDIR" ] ; then
+-	INSTALLDIR="$BUILD_DKPRO_INSTALLDIR"
++	export INSTALLDIR="$BUILD_DKPRO_INSTALLDIR"
+ else
+ 	echo
+ 	echo "Please enter the directory where you would like '$package' to be installed:"
+ 	echo "for mingw/msys you must use <drive>:/<install path> or you will have include path problems"
+ 	echo "this is the top level directory for devkitpro, i.e. e:/devkitPro"
+ 
+-	read -e INSTALLDIR
++	read -e INSTALLDIRH
++	export INSTALLDIR="$INSTALLDIRH"
+ 	echo
+ fi
+ 
+diff -uprN buildscripts/dkarm-eabi/scripts/build-crtls.sh buildscripts_/dkarm-eabi/scripts/build-crtls.sh
+--- buildscripts/dkarm-eabi/scripts/build-crtls.sh	2021-11-07 16:45:12.506925274 +0900
++++ buildscripts_/dkarm-eabi/scripts/build-crtls.sh	2021-11-07 16:40:06.331548059 +0900
+@@ -12,6 +12,7 @@ export DEVKITARM=$DEVKITPRO/devkitARM
+ cd $BUILDDIR
+ 
+ tar -xvf $SRCDIR/devkitarm-rules-$DKARM_RULES_VER.tar.gz
++patch Makefile < $RACROSS_BASE/devkitarm-rules_Makefile.patch
+ cd devkitarm-rules-$DKARM_RULES_VER
+ make install
+ 
+@@ -21,6 +22,7 @@ make install
+ cd $BUILDDIR
+ 
+ tar -xvf $SRCDIR/devkitarm-crtls-$DKARM_CRTLS_VER.tar.gz
++patch Makefile < $RACROSS_BASE/devkitarm-crtls_Makefile.patch
+ cd devkitarm-crtls-$DKARM_CRTLS_VER
+ make install
+ 
+diff -uprN buildscripts/dkppc/scripts/build-crtls.sh buildscripts_/dkppc/scripts/build-crtls.sh
+--- buildscripts/dkppc/scripts/build-crtls.sh	2021-11-07 16:45:12.506925274 +0900
++++ buildscripts_/dkppc/scripts/build-crtls.sh	2021-11-07 16:43:06.619193608 +0900
+@@ -12,5 +12,6 @@ export DEVKITPPC=$DEVKITPRO/devkitPPC
+ cd $BUILDDIR
+ 
+ tar -xvf $SRCDIR/devkitppc-rules-$DKPPC_RULES_VER.tar.gz
++patch Makefile < $RACROSS_BASE/devkitppc-rules_Makefile.patch
+ cd devkitppc-rules-$DKPPC_RULES_VER
+ make install

@@ -1,535 +1,472 @@
 #!/bin/bash
 
-source RAcross_config.sh
+RACROSS_GIT_INIT=0
+
+if [ ${RACROSS_GIT_INIT} -ne 0 ]; then
+ git config --global user.email "you@example.com"
+ git config --global user.name "Your Name"
+fi
+ssh -oStrictHostKeyChecking=no github.com
+
+RACROSS_BUILDROOT=0
 
 export RACROSS_BASE=`pwd`
 
 export RACROSS_CACHE=${RACROSS_BASE}/cache
+rm -rf ${RACROSS_CACHE}
+mkdir -p ${RACROSS_CACHE}
+
 export RACROSS_TOOLS=${HOME}/RAcross-tools
+rm -rf ${RACROSS_TOOLS}
+mkdir -p ${RACROSS_TOOLS}
 
-RACROSS_INITSCRIPT=${HOME}/.profile
+RACROSS_INITSCRIPT=~/.profile
 
-RACROSS_SETUP_GIT=1
+RACROSS_LOG=${RACROSS_BASE}/log
+rm -rf ${RACROSS_LOG}
+mkdir ${RACROSS_LOG}
 
-if [[ ${RACROSS_SETUP_GIT} = 1 ]] ; then
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
-fi
-
-mkdir ${HOME}/.ssh
-touch ${HOME}/.ssh/known_hosts
-ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts
-
-# OpenDigux GCW0 toolchain (and tools)
-echo "*** setup OpenDigux GCW0 toolchain ***"
-cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/OpenDingux/buildroot.git
-	tar -Jcf ${RACROSS_CACHE}/buildroot.tar.xz buildroot
-else
-	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mv buildroot GCW0_buildroot
-	cd GCW0_buildroot
-	make od_gcw0_defconfig
-	export BR2_JLEVEL=0
-	make
-	cd ..
-	mv GCW0_buildroot ${RACROSS_TOOLS}/
+if [ ${RACROSS_BUILDROOT} -ne 0 ]; then
+ RACROSS_TOOLCHAIN=~/.local/opt
+ mkdir -p ${RACROSS_TOOLCHAIN}
 fi
 
-# OpenDigux RS90 toolchain (and tools)
-echo "*** setup OpenDigux RS90 toolchain ***"
-cd ${RACROSS_BASE}
-rm -rf buildroot
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/OpenDingux/buildroot.git
-else
-	tar -Jxf ${RACROSS_CACHE}/buildroot.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mv buildroot RS90_buildroot
-	cd RS90_buildroot
-	make od_rs90_defconfig
-	make
-	cd ..
-	mv RS90_buildroot ${RACROSS_TOOLS}/
-fi
-
-# OpenDigux RG350 toolchain (and tools)
-echo "*** setup OpenDigux RG350 toolchain ***"
-cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --depth=1 https://github.com/tonyjih/RG350_buildroot.git
-	patch -p1 -d RG350_buildroot < ${RACROSS_BASE}/RG350_buildroot.patch
-	tar -Jcf ${RACROSS_CACHE}/RG350_buildroot.tar.xz RG350_buildroot
-else
-	tar -Jxf ${RACROSS_CACHE}/RG350_buildroot.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd RG350_buildroot
-	make rg350_defconfig BR2_EXTERNAL=board/opendingux
-	./rebuild.sh
-	cd ..
-	mv RG350_buildroot ${RACROSS_TOOLS}/
-fi
-
-# ps2toolchain
-echo "*** setup ps2toolchain ***"
-cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/ps2dev/ps2toolchain.git
-	tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
-	git clone https://github.com/ps2dev/ps2sdk-ports.git
-	tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
-	git clone https://github.com/ps2dev/gsKit.git
-	tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
-	git clone https://github.com/ps2dev/ps2-packer.git
-	tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf ps2toolchain
-		rm -rf ps2sdk-ports
-		rm -rf gsKit
-		rm -rf ps2-packer
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/ps2toolchain.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/gsKit.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/ps2-packer.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PS2DEV=${RACROSS_TOOLS}/ps2dev
-	export PS2SDK=$PS2DEV/ps2sdk
-	export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
-	echo "export PS2DEV=${RACROSS_TOOLS}/ps2dev" >> ${RACROSS_INITSCRIPT}
-	echo "export PS2SDK=\$PS2DEV/ps2sdk" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PS2DEV/bin:\$PS2DEV/ee/bin:\$PS2DEV/iop/bin:\$PS2DEV/dvp/bin:\$PS2SDK/bin" >> ${RACROSS_INITSCRIPT}
-	cd ps2toolchain
-	./toolchain.sh
-	cd ${RACROSS_BASE}/ps2sdk-ports
-	make
-	make install
-	cd ${RACROSS_BASE}/gsKit
-	make
-	make install
-	cd ${RACROSS_BASE}/ps2-packer
-	make
-	make install
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf ps2toolchain
-		rm -rf ps2sdk-ports
-		rm -rf gsKit
-		rm -rf ps2-packer
-	fi
-fi
+# repo
+mkdir -p ~/.local/bin
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.local/bin/repo
+chmod a+x ~/.local/bin/repo
+export PATH=$PATH:~/.local/bin
+echo 'PATH=$PATH:~/.local/bin' >> ${RACROSS_INITSCRIPT}
 
 # psptoolchain
 echo "*** setup psptoolchain ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/pspdev/psptoolchain.git
-	tar -Jcf ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf psptoolchain
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/psptoolchain.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PSPDEV=${RACROSS_TOOLS}/pspdev
-	export PATH=$PATH:$PSPDEV/bin
-	echo "export PSPDEV=${RACROSS_TOOLS}/pspdev" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PSPDEV/bin" >> ${RACROSS_INITSCRIPT}
-	cd psptoolchain
-	./toolchain.sh
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf psptoolchain
-	fi
-fi
-
-# libtransistor
-echo "*** setup libtransistor ***"
+git clone --depth=1 https://github.com/pspdev/psptoolchain.git
+tar -Jcv ${RACROSS_CACHE}/psptoolchain.tar.xz psptoolchain
+export PSPDEV=${RACROSS_TOOLS}/pspdev
+export PATH=$PATH:$PSPDEV/bin
+echo "export PSPDEV=${RACROSS_TOOLS}/pspdev" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PSPDEV/bin" >> ${RACROSS_INITSCRIPT}
+cd psptoolchain
+./toolchain.sh
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export LIBTRANSISTOR_HOME=${RACROSS_TOOLS}/libtransistor/dist
-	echo "export LIBTRANSISTOR_HOME=${RACROSS_TOOLS}/libtransistor/dist" >> ${RACROSS_INITSCRIPT}
-fi
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone --recursive https://github.com/reswitched/libtransistor
-	tar -Jcf ${RACROSS_CACHE}/libtransistor.tar.xz libtransistor
-	git clone --recursive https://github.com/reswitched/libtransistor-base
-	tar -Jcf ${RACROSS_CACHE}/libtransistor-base.tar.xz libtransistor-base
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf libtransistor-base
-		rm -rf libtransistor
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/libtransistor.tar.xz
-	tar -Jxf ${RACROSS_CACHE}/libtransistor-base.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd libtransistor-base
-	pip install -r requirements.txt
-	make
-	cp -r dist ../libtransistor/
-	cd ../libtransistor
-	make
-	mkdir -p ${RACROSS_TOOLS}/libtransistor
-	cp -r dist ${RACROSS_TOOLS}/libtransistor/
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf libtransistor-base
-		rm -rf libtransistor
-	fi
-fi
+rm -rf psptoolchain
+
+## libtransistor
+## /home/domi/RAcross_linux/libtransistor/dist/include/expected.hpp:20:10: fatal error: 'exception' file not found
+##include <exception>
+#echo "*** setup libtransistor ***"
+#cd ${RACROSS_BASE}
+#export LIBTRANSISTOR_HOME=${RACROSS_TOOLS}/libtransistor/dist
+#echo "export LIBTRANSISTOR_HOME=${RACROSS_TOOLS}/libtransistor/dist" >> ${RACROSS_INITSCRIPT}
+#git clone --recursive https://github.com/reswitched/libtransistor
+#tar -Jcf ${RACROSS_CACHE}/libtransistor.tar.xz libtransistor
+#git clone --recursive https://github.com/reswitched/libtransistor-base
+#tar -Jcf ${RACROSS_CACHE}/libtransistor-base.tar.xz libtransistor-base
+#cd libtransistor-base
+#pip3 install -r requirements.txt
+#make
+#cp -r dist ../libtransistor/
+#cd ../libtransistor
+#make
+#mkdir -p ${RACROSS_TOOLS}/libtransistor
+#cp -r dist ${RACROSS_TOOLS}/libtransistor/
+#cd ${RACROSS_BASE}
+#rm -rf libtransistor-base
+#rm -rf libtransistor
 
 # crosstool-NG
 echo "*** setup crosstool-NG ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng
-	git remote add AZO234 https://github.com/AZO234/crosstool-ng.git
-	git pull --no-edit AZO234 fix
-	cd ..
-	tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf crosstool-ng
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/crosstool-ng.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd crosstool-ng
-	./bootstrap
-	automake --add-missing
-	./configure --prefix=${RACROSS_TOOLS}/crosstool-ng
-	make
-	make install
-	export PATH=$PATH:${RACROSS_TOOLS}/crosstool-ng/bin
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/crosstool-ng/bin" >> ${RACROSS_INITSCRIPT}
-	ct-ng update-samples
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf crosstool-ng
-	fi
-fi
+git clone --depth=1 https://github.com/crosstool-ng/crosstool-ng
+tar -Jcf ${RACROSS_CACHE}/crosstool-ng.tar.xz crosstool-ng
+cd crosstool-ng
+./bootstrap
+automake --add-missing
+./configure --prefix=${RACROSS_TOOLS}/crosstool-ng
+make 2>&1 ${RACROSS_LOG}/crosstool-ng.log
+make install
+export PATH=$PATH:${RACROSS_TOOLS}/crosstool-ng/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/crosstool-ng/bin" >> ${RACROSS_INITSCRIPT}
+ct-ng update-samples
+cd ${RACROSS_BASE}
+rm -rf crosstool-ng
 
 echo "*** setup RPi2 cross env ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mkdir armv7-rpi2-linux
-	cd armv7-rpi2-linux
-	ct-ng armv7-rpi2-linux-gnueabihf
-	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
-	mv .config_mod .config
-	ct-ng build
-	export PATH=$PATH:${RACROSS_TOOLS}/armv7-rpi2-linux-gnueabihf/buildtools/bin
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/armv7-rpi2-linux-gnueabihf/bin" >> ${RACROSS_INITSCRIPT}
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf armv7-rpi2-linux
-	fi
-fi
-
-echo "*** setup armv8 RPi3 cross env ***"
+mkdir armv7-rpi2-linux
+cd armv7-rpi2-linux
+ct-ng armv7-rpi2-linux-gnueabihf
+sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+mv .config_mod .config
+ct-ng build 2>&1 ${RACROSS_LOG}/rpi2.log
+export PATH=$PATH:${RACROSS_TOOLS}/armv7-rpi2-linux-gnueabihf/buildtools/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/armv7-rpi2-linux-gnueabihf/bin" >> ${RACROSS_INITSCRIPT}
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mkdir armv8-rpi3-linux
-	cd armv8-rpi3-linux
-	ct-ng armv8-rpi3-linux-gnueabihf
-	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
-	mv .config_mod .config
-	ct-ng build
-	export PATH=$PATH:${RACROSS_TOOLS}/armv8-rpi3-linux-gnueabihf/buildtools/bin
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/armv8-rpi3-linux-gnueabihf/bin" >> ${RACROSS_INITSCRIPT}
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf armv8-rpi3-linux
-	fi
-fi
+rm -rf armv7-rpi2-linux
 
-echo "*** setup aarch64 RPi3 cross env ***"
+echo "*** setup RPi3 32bit cross env ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mkdir aarch64-rpi3-linux-gnu
-	cd aarch64-rpi3-linux-gnu
-	ct-ng aarch64-rpi3-linux-gnu
-	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
-	mv .config_mod .config
-	ct-ng build
-	export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/buildtools/bin
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf aarch64-rpi3-linux-gnu
-	fi
-fi
+mkdir armv8-rpi3-linux
+cd armv8-rpi3-linux
+ct-ng armv8-rpi3-linux-gnueabihf
+sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+mv .config_mod .config
+ct-ng build 2>&1 ${RACROSS_LOG}/rpi3_32.log
+export PATH=$PATH:${RACROSS_TOOLS}/armv8-rpi3-linux-gnueabihf/buildtools/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/armv8-rpi3-linux-gnueabihf/bin" >> ${RACROSS_INITSCRIPT}
+cd ${RACROSS_BASE}
+rm -rf armv8-rpi3-linux
 
-echo "*** setup aarch64 RPi4 cross env ***"
+echo "*** setup RPi3 64bit cross env ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	mkdir aarch64-rpi4-linux-gnu
-	cd aarch64-rpi4-linux-gnu
-	ct-ng aarch64-rpi4-linux-gnu
-	sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
-	mv .config_mod .config
-	ct-ng build
-	export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/buildtools/bin
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf aarch64-rpi4-linux-gnu
-	fi
+mkdir aarch64-rpi3-linux
+cd aarch64-rpi3-linux
+ct-ng aarch64-rpi3-linux-gnu
+sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+mv .config_mod .config
+ct-ng build 2>&1 ${RACROSS_LOG}/rpi3_64.log
+export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/buildtools/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi3-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
+cd ${RACROSS_BASE}
+rm -rf aarch64-rpi3-linux
+
+echo "*** setup RPi4 32bit cross env ***"
+cd ${RACROSS_BASE}
+mkdir armv8-rpi4-linux
+cd armv8-rpi4-linux
+ct-ng armv8-rpi4-linux-gnueabihf
+sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+mv .config_mod .config
+ct-ng build 2>&1 ${RACROSS_LOG}/rpi4_32.log
+export PATH=$PATH:${RACROSS_TOOLS}/armv8-rpi4-linux-gnueabihf/buildtools/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/armv8-rpi4-linux-gnueabihf/bin" >> ${RACROSS_INITSCRIPT}
+cd ${RACROSS_BASE}
+rm -rf armv8-rpi4-linux
+
+echo "*** setup RPi4 64bit cross env ***"
+cd ${RACROSS_BASE}
+mkdir aarch64-rpi4-linux
+cd aarch64-rpi4-linux
+ct-ng aarch64-rpi4-linux-gnu
+sed -e "s/\${HOME}\/x-tools/\${RACROSS_TOOLS}/g" .config > .config_mod
+mv .config_mod .config
+ct-ng build 2>&1 ${RACROSS_LOG}/rpi4_64.log
+export PATH=$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/buildtools/bin
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/aarch64-rpi4-linux-gnu/bin" >> ${RACROSS_INITSCRIPT}
+cd ${RACROSS_BASE}
+rm -rf aarch64-rpi4-linux
+
+if [ ${RACROSS_BUILDROOT} -ne 0 ]; then
+ # GCW0
+#c-stack.c:55:26: error: missing binary operator before token "("
+#   55 | #elif HAVE_LIBSIGSEGV && SIGSTKSZ < 16384
+#      |                          ^~~~~~~~
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/gcwnow/buildroot.git GCW0_buildroot
+# cp 04-fix-sigstksz.patch GCW0_buildroot/package/m4/
+# cp no_STAT_VER.patch GCW0_buildroot/package/fakeroot/
+ cd GCW0_buildroot
+ make gcw0_defconfig
+ make -j4
+ mv output/host gcw0-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf GCW0_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/gcw0-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/gcw0-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # RS90
+#mkdir: ディレクトリ `/opt/rs90-toolchain' を作成できません: 許可がありません
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/rs90-randomsjunk/buildroot.git RS90_buildroot
+ cd RS90_buildroot
+ make od_rs90_defconfig
+ make -j4
+ mv output/host rs90-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf RS90_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/rs90-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/rs90-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # RS97
+#No file to patch.  Skipping patch.
+#1 out of 1 hunk ignored
+#make[1]: *** [package/pkg-generic.mk:209: /home/domi/RAcross_linux/RS97_buildroot/output/build/sdl_mixer-1.2.13/.stamp_patched] エラー 1
+#make: *** [Makefile:84: _all] エラー 2
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/rs-97-cfw/buildroot.git RS97_buildroot
+ cp 04-fix-sigstksz.patch RS97_buildroot/package/m4/
+ cp no_STAT_VER.patch RS97_buildroot/package/fakeroot/
+ cd RS97_buildroot
+ make rs97_config
+ make -j4
+ mv output/host rs97-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf RS97_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/rs97-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/rs97-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # RG350
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/tonyjih/RG350_buildroot.git
+ cd RG350_buildroot
+ make rg350_defconfi
+ make -j4
+ mv output/host rg350-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf RG350_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/rg350-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/rg350-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # RG351
+#configure: error: in `/home/domi/RAcross_linux/rg351p-buildroot/output/build/sdl_mixer-1.2.13':
+#configure: error: C compiler cannot create executables
+#See `config.log' for more details
+#make[1]: *** [package/pkg-generic.mk:240: /home/domi/RAcross_linux/rg351p-buildroot/output/build/sdl_mixer-1.2.13/.stamp_configured] エラー 77
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/gameblabla/rg351p-buildroot.git
+ cp 04-fix-sigstksz.patch rg351p-buildroot/package/m4/
+ cp no_STAT_VER.patch rg351p-buildroot/package/fakeroot/
+ rm rg351p-buildroot/package/sdl_mixer/0001-Add-Libs.private-field-to-pkg-config-file.patch
+ rm rg351p-buildroot/package/sdl_mixer/0004-modpluginclude.patch
+ rm rg351p-buildroot/package/sdl_mixer/0005-Fixwontbuildontremor.patch
+ rm rg351p-buildroot/package/sdl_mixer/0007-forceTremor.patch
+ rm rg351p-buildroot/package/sdl_mixer/0008-forceTremor.patch
+ cd rg351p-buildroot
+ make rg351p_defconfig
+ make -j4
+ mv output/host rg351-toolchain
+ cd ${RACROSS_BASE}
+# rm -rf rg351p-buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/rg351-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/rg351-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # Odroid C1
+#./libexec/gcc/arm-linux-gnueabihf/4.9.1/cc1: error while loading shared libraries: libz.so.1: cannot open shared object file: No such file or directory
+#Incorrect ABI setting: EABIhf selected, but toolchain is incompatible
+#make[1]: *** [package/pkg-generic.mk:188: /home/domi/RAcross_linux/buildroot-Odroid-C1/output/build/toolchain-external-undefined/.stamp_configured] エラー 1
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/wzab/buildroot-Odroid-C1.git
+ cd buildroot-Odroid-C1
+ make odroidc1_defconfig
+ make -j4
+ mv output/host odroidc1-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf buildroot-Odroid-C1
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/odroidc1-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/odroidc1-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # Odroid C2
+ #SSP support not available in this toolchain, please disable BR2_TOOLCHAIN_EXTERNAL_HAS_SSP
+ #make[1]: *** [package/pkg-generic.mk:188: /home/domi/RAcross_linux/OdroidC2_buildroot/output/build/toolchain-external-undefined/.stamp_configured] エラー 1
+ cd ${RACROSS_BASE}
+ git clone --depth 1 https://github.com/hardkernel/buildroot.git OdroidC2_buildroot
+ cd OdroidC2_buildroot
+ make odroidc2_defconfig
+ make -j4
+ mv output/host odroidc2-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf OdroidC2_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/odroidc2-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/odroidc2-toolchain/bin" >> ${RACROSS_INITSCRIPT}
+
+ # Odroid C4
+ #make[1]: *** [package/pkg-generic.mk:231: /home/domi/RAcross_linux/OdroidC4_buildroot/output/odroidc4/build/toolchain-external-linaro-aarch64-6dot2-201702-preinstalled/.stamp_configured] エラー 1
+
+ cd ${RACROSS_BASE}
+ mkdir OdroidC4_buildroot
+ cd OdroidC4_buildroot
+ repo init -u https://github.com/hardkernel/platform-manifest.git -b aml64_buildroot_master_c4 --depth=1
+ repo sync
+ repo start aml64_buildroot_master_c4 --all
+ source buildroot/build/setenv.sh odroidc4_release
+ make -j4
+ mv output/host odroidc4-toolchain
+ cd ${RACROSS_BASE}
+ rm -rf OdroidC4_buildroot
+ export PATH=$PATH:${RACROSS_TOOLCHAIN}/odroidc4-toolchain/bin
+ echo "export PATH=\$PATH:${RACROSS_TOOLCHAIN}/odroidc4-toolchain/bin" >> ${RACROSS_INITSCRIPT}
 fi
 
 # Xenon_Toolchain
 echo "*** setup Xenon_Toolchain ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export DEVKITXENON="${RACROSS_TOOLS}/xenon"
-	export PATH="$PATH:$DEVKITXENON/bin:$DEVKITXENON/usr/bin"
-	echo "export DEVKITXENON=${RACROSS_TOOLS}/xenon" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin" >> ${RACROSS_INITSCRIPT}
-fi
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/Free60Project/libxenon.git
-	cd libxenon
-	git remote add AZO234 https://github.com/AZO234/libxenon.git
-	git pull --no-edit AZO234 fix
-	cd ..
-	cp ${RACROSS_BASE}/gcc.diff_4.7.4 libxenon/toolchain/
-	tar -Jcf ${RACROSS_CACHE}/libxenon.tar.xz libxenon
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf libxenon
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/libxenon.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd libxenon/toolchain
-	./build-xenon-toolchain toolchain
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf libxenon
-	fi
-fi
+export DEVKITXENON="${RACROSS_TOOLS}/xenon"
+export PATH="$PATH:$DEVKITXENON/bin:$DEVKITXENON/usr/bin"
+echo "export DEVKITXENON=${RACROSS_TOOLS}/xenon" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$DEVKITXENON/bin:\$DEVKITXENON/usr/bin" >> ${RACROSS_INITSCRIPT}
+git clone --depth=1 https://github.com/Free60Project/libxenon.git
+tar -Jcf ${RACROSS_CACHE}/libxenon.tar.xz libxenon
+cd libxenon/toolchain
+export PREFIX=~/RAcross-tools/xenon
+./build-xenon-toolchain toolchain
+cd ${RACROSS_BASE}
+rm -rf libxenon
+export PREFIX
 
 # Vita SDK
 echo "*** setup Vita SDK ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export VITASDK=${RACROSS_TOOLS}/vitasdk
-	export PATH=$VITASDK/bin:$PATH
-	echo "export VITASDK=${RACROSS_TOOLS}/vitasdk" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$VITASDK/bin:\$PATH" >> ${RACROSS_INITSCRIPT}
-fi
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/vitasdk/vdpm.git
-	cd vdpm
-	git remote add AZO234 https://github.com/AZO234/vdpm.git
-	git pull --no-edit AZO234 fix
-	cd ..
-	tar -Jcf ${RACROSS_CACHE}/vdpm.tar.xz vdpm
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf vdpm
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/vdpm.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd vdpm
-	./bootstrap-vitasdk.sh
-	./install-all.sh
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf vdpm
-	fi
-fi
+export VITASDK=${RACROSS_TOOLS}/vitasdk
+export PATH=$VITASDK/bin:$PATH
+echo "export VITASDK=${RACROSS_TOOLS}/vitasdk" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$VITASDK/bin:\$PATH" >> ${RACROSS_INITSCRIPT}
+git clone --depth=1 https://github.com/vitasdk/vdpm
+tar -Jcf ${RACROSS_CACHE}/vdpm.tar.xz vdpm
+cd vdpm
+./bootstrap-vitasdk.sh
+./install-all.sh
+cd ${RACROSS_BASE}
+rm -rf vdpm
 
 # devkitPro
+#devkita64-rules-1.0.1.tar.gz
+#curl: (22) The requested URL returned error: 404 
+
 echo "*** setup devkitPro ***"
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/devkitPro/buildscripts.git
-	cd buildscripts
-	git remote add AZO234 https://github.com/AZO234/buildscripts.git
-	git pull --no-edit AZO234 fix
-	cd ..
-	cp ${RACROSS_BASE}/config1.sh buildscripts/
-	cp ${RACROSS_BASE}/config2.sh buildscripts/
-	cp ${RACROSS_BASE}/config3.sh buildscripts/
-	tar -Jcf ${RACROSS_CACHE}/buildscripts.tar.xz buildscripts
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf buildscripts
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/buildscripts.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export DEVKITPRO=${RACROSS_TOOLS}/devkitpro
-	export DEVKITARM=$DEVKITPRO/devkitARM
-	export DEVKITA64=$DEVKITPRO/devkitA64
-	export DEVKITPPC=$DEVKITPRO/devkitPPC
-	echo "export DEVKITPRO=${RACROSS_TOOLS}/devkitpro" >> ${RACROSS_INITSCRIPT}
-	echo "export DEVKITARM=\$DEVKITPRO/devkitARM" >> ${RACROSS_INITSCRIPT}
-	echo "export DEVKITA64=\$DEVKITPRO/devkitA64" >> ${RACROSS_INITSCRIPT}
-	echo "export DEVKITPPC=\$DEVKITPRO/devkitPPC" >> ${RACROSS_INITSCRIPT}
-	cd buildscripts
-	cp config1.sh config.sh
-	./build-devkit.sh
-	cp config2.sh config.sh
-	./build-devkit.sh
-	cp config3.sh config.sh
-	./build-devkit.sh
-	patch ${DEVKITA64}/base_tools < ${RACROSS_BASE}/devkitA64_base_tools.patch
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf buildscripts
-	fi
-fi
+git clone --depth=1 https://github.com/devkitPro/buildscripts.git
+patch -p1 -d buildscripts < ${RACROSS_BASE}/buildscripts.patch
+cp ${RACROSS_BASE}/config1.sh buildscripts/
+cp ${RACROSS_BASE}/config2.sh buildscripts/
+cp ${RACROSS_BASE}/config3.sh buildscripts/
+tar -Jcf ${RACROSS_CACHE}/buildscripts.tar.xz buildscripts
+export DEVKITPRO=${RACROSS_TOOLS}/devkitpro
+export DEVKITARM=$DEVKITPRO/devkitARM
+export DEVKITA64=$DEVKITPRO/devkitA64
+export DEVKITPPC=$DEVKITPRO/devkitPPC
+export LIBCTRU=${RACROSS_TOOLS}/devkitpro/libctru
+export LIBOGC=${RACROSS_TOOLS}/devkitpro/libogc
+export LIBNX=${RACROSS_TOOLS}/devkitpro/libnx
+echo "export DEVKITPRO=${RACROSS_TOOLS}/devkitpro" >> ${RACROSS_INITSCRIPT}
+echo "export DEVKITARM=\$DEVKITPRO/devkitARM" >> ${RACROSS_INITSCRIPT}
+echo "export DEVKITA64=\$DEVKITPRO/devkitA64" >> ${RACROSS_INITSCRIPT}
+echo "export DEVKITPPC=\$DEVKITPRO/devkitPPC" >> ${RACROSS_INITSCRIPT}
+echo "export LIBCTRU=\$DEVKITPRO/libctru" >> ${RACROSS_INITSCRIPT}
+echo "export LIBOGC=\$DEVKITPRO/libogc" >> ${RACROSS_INITSCRIPT}
+echo "export LIBNX=\$DEVKITPRO/libnx" >> ${RACROSS_INITSCRIPT}
+cd buildscripts
+cp config1.sh config.sh
+./build-devkit.sh
+cp config2.sh config.sh
+./build-devkit.sh
+cp config3.sh config.sh
+./build-devkit.sh
+cd ${RACROSS_BASE}
+rm -rf buildscripts
+
+# ps2toolchain
+#/bin/bash: 行 1: /home/domi/RAcross_linux/ps2toolchain/build/ps2toolchain-ee/build/gcc/build-mips64r5900el-ps2-elf-stage2/./gcc/xgcc: そのようなファイルやディレクトリはありません
+echo "*** setup ps2toolchain ***"
+cd ${RACROSS_BASE}
+git clone https://github.com/ps2dev/ps2toolchain.git
+tar -Jcf ${RACROSS_CACHE}/ps2toolchain.tar.xz ps2toolchain
+git clone https://github.com/ps2dev/ps2sdk-ports.git
+tar -Jcf ${RACROSS_CACHE}/ps2sdk-ports.tar.xz ps2sdk-ports
+git clone https://github.com/ps2dev/gsKit.git
+tar -Jcf ${RACROSS_CACHE}/gsKit.tar.xz gsKit
+git clone https://github.com/ps2dev/ps2-packer.git
+tar -Jcf ${RACROSS_CACHE}/ps2-packer.tar.xz ps2-packer
+export PS2DEV=${RACROSS_TOOLS}/ps2dev
+export PS2SDK=$PS2DEV/ps2sdk
+export PATH=$PATH:$PS2DEV/bin:$PS2DEV/ee/bin:$PS2DEV/iop/bin:$PS2DEV/dvp/bin:$PS2SDK/bin
+echo "export PS2DEV=${RACROSS_TOOLS}/ps2dev" >> ${RACROSS_INITSCRIPT}
+echo "export PS2SDK=\$PS2DEV/ps2sdk" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PS2DEV/bin:\$PS2DEV/ee/bin:\$PS2DEV/iop/bin:\$PS2DEV/dvp/bin:\$PS2SDK/bin" >> ${RACROSS_INITSCRIPT}
+cd ps2toolchain
+./toolchain.sh
+cd ${RACROSS_BASE}/ps2sdk-ports
+make
+make install
+cd ${RACROSS_BASE}/gsKit
+make
+make install
+cd ${RACROSS_BASE}/ps2-packer
+make
+make install
+cd ${RACROSS_BASE}
+rm -rf ps2toolchain
+rm -rf ps2sdk-ports
+rm -rf gsKit
+rm -rf ps2-packer
 
 # ps3toolchain
+#--2021-11-07 13:13:12--  http://mirror.yongbok.net/nongnu/freetype/freetype-2.4.3.tar.gz
+#mirror.yongbok.net (mirror.yongbok.net) をDNSに問いあわせています... 169.56.72.170, 2401:c900:1601:148::3
+#mirror.yongbok.net (mirror.yongbok.net)|169.56.72.170|:80 に接続しています... 接続しました。
+#HTTP による接続要求を送信しました、応答を待っています... 404 Not Found
+#2021-11-07 13:13:12 エラー 404: Not Found。
 echo "*** setup ps3toolchain ***"
+mkdir -p ${RACROSS_TOOLS}/ps3dev
+cd ${RACROSS_TOOLS}/ps3dev
+git clone --depth=1 https://github.com/ps3dev/ps3toolchain.git
+tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
+export PS3DEV=${RACROSS_TOOLS}/ps3dev
+export PATH=$PATH:$PS3DEV/bin
+export PATH=$PATH:$PS3DEV/ppu/bin
+export PATH=$PATH:$PS3DEV/spu/bin
+export PSL1GHT=$PS3DEV/psl1ght
+export PATH=$PATH:$PSL1GHT/host/bin
+echo "export PS3DEV=${RACROSS_TOOLS}/ps3dev" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PS3DEV/bin" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PS3DEV/ppu/bin" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PS3DEV/spu/bin" >> ${RACROSS_INITSCRIPT}
+echo "export PSL1GHT=\$PS3DEV/psl1ght" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:\$PSL1GHT/host/bin" >> ${RACROSS_INITSCRIPT}
+cd ps3toolchain
+./toolchain.sh
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/ps3dev/ps3toolchain.git
-	tar -Jcf ${RACROSS_CACHE}/ps3toolchain.tar.xz ps3toolchain
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf ps3toolchain
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/ps3toolchain.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PS3DEV=${RACROSS_TOOLS}/ps3dev
-	export PSL1GHT=${PS3DEV}/psl1ght
-	export PATH=$PATH:$PS3DEV/bin
-	export PATH=$PATH:$PS3DEV/ppu/bin
-	export PATH=$PATH:$PS3DEV/spu/bin
-	echo "export PS3DEV=${RACROSS_TOOLS}/ps3dev" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PS3DEV/bin" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PS3DEV/ppu/bin" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PS3DEV/spu/bin" >> ${RACROSS_INITSCRIPT}
-	cd ps3toolchain
-	./toolchain.sh
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf ps3toolchain
-	fi
-fi
-
-# PSL1GHT
-echo "*** setup PSL1GHT ***"
-rm -rf ${PSL1GHT}
-cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/bucanero/PSL1GHT.git
-	tar -Jcf ${RACROSS_CACHE}/PSL1GHT.tar.xz PSL1GHT
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf PSL1GHT
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/PSL1GHT.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	export PATH=$PATH:$PSL1GHT/host/bin
-	echo "export PSL1GHT=${PSL1GHT}" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:\$PSL1GHT/host/bin" >> ${RACROSS_INITSCRIPT}
-	cd PSL1GHT
-	make install-ctrl
-	make
-	make install
-	if [[ ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-		cd ${RACROSS_BASE}
-		rm -rf PSL1GHT
-	fi
-fi
-
-# Theos
-echo "*** setup Theos ***"
-cd ${RACROSS_BASE}
-export THEOS=${RACROSS_TOOLS}/theos
-echo "export THEOS=${RACROSS_TOOLS}/theos" >> ${RACROSS_INITSCRIPT}
-git clone https://github.com/theos/theos.git ${THEOS}
-cd ${THEOS}
-git remote add AZO234 https://github.com/AZO234/theos.git
-git pull --no-edit AZO234 fix
-git submodule update --init --recursive
-cd ${RACROSS_BASE}
-curl https://kabiroberai.com/toolchain/download.php?toolchain=ios-linux -Lo toolchain.tar.gz
-tar -xzf toolchain.tar.gz -C ${THEOS}/toolchain
-rm -rf ${THEOS}/sdks
-git clone https://github.com/hirakujira/sdks.git ${THEOS}/sdks
-curl https://swift.org/builds/swift-5.2.1-release/ubuntu1804/swift-5.2.1-RELEASE/swift-5.2.1-RELEASE-ubuntu18.04.tar.gz -Lo swift-toolchain.tar.gz
-tar -zxf swift-toolchain.tar.gz
-mkdir ${THEOS}/sdks/swift
-mv swift-5.2.1-RELEASE-ubuntu18.04/usr/* ${THEOS}/sdks/swift
-if [[ ! ${RACROSS_SETUP_DELETE} = 1 ]] ; then
-	tar Jcvf ${RACROSS_CACHE}/theos.tar.xz ${THEOS}
-fi
+rm -rf ps3toolchain
 
 # Emscripten
 echo "*** setup Emscripten ***"
+RACROSS_EMSDK_VER=2.0.31
 cd ${RACROSS_TOOLS}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/emscripten-core/emsdk.git
-	cd emsdk
-	./emsdk update
-	git pull
-	cd ${RACROSS_TOOLS}
-	tar -Jcf ${RACROSS_CACHE}/emsdk.tar.xz emsdk
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf emsdk
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/emsdk.tar.xz
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cd emsdk
-	./emsdk install latest
-	./emsdk activate latest
-	./emsdk_env.sh
-	echo "source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh" >> ${RACROSS_INITSCRIPT}
-fi
+git clone --depth=1 https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk update
+git pull
+cd ${RACROSS_TOOLS}
+tar -Jcf ${RACROSS_CACHE}/emsdk.tar.xz emsdk
+export EMSDK=${RACROSS_TOOLS}/emsdk
+export PATH=$PATH:${EMSDK}/emscripten/${RACROSS_EMSDK_VER}
+export EM_CONFIG=/home/${USER}/.emscripten
+export EMSCRIPTEN_NATIVE_OPTIMIZER=${EMSDK}/clang/e${RACROSS_EMSDK_VER}_64bit/optimizer
+export EMSCRIPTEN=${EMSDK}/emscripten/${RACROSS_EMSDK_VER}
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source ./emsdk_env.sh
+cd ${RACROSS_BASE}
+rm -rf emsdk
 
 # Android NDK
-echo "*** setup Android NDK ***"
+echo "*** setup android ***"
+RACROSS_ANDROIDNDK_VER=23
 cd ${RACROSS_BASE}
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	wget https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip -P ${RACROSS_CACHE}
-fi
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	unzip ${RACROSS_CACHE}/android-ndk-r21b-linux-x86_64.zip -d ${RACROSS_TOOLS}/
-	export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21b
-	export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r21b
-	echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r21b" >> ${RACROSS_INITSCRIPT}
-	echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r21b" >> ${RACROSS_INITSCRIPT}
-fi
+wget https://dl.google.com/android/repository/android-ndk-r${RACROSS_ANDROIDNDK_VER}-linux-x86_64.zip -O ${RACROSS_CACHE}/android-ndk-r${RACROSS_ANDROIDNDK_VER}-linux-x86_64.zip
+unzip ${RACROSS_CACHE}/android-ndk-r${RACROSS_ANDROIDNDK_VER}-linux-x86_64.zip -d ${RACROSS_TOOLS}/
+export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r${RACROSS_ANDROIDNDK_VER}
+export PATH=$PATH:${RACROSS_TOOLS}/android-ndk-r${RACROSS_ANDROIDNDK_VER}
+echo "export NDK_ROOT_DIR=${RACROSS_TOOLS}/android-ndk-r${RACROSS_ANDROIDNDK_VER}" >> ${RACROSS_INITSCRIPT}
+echo "export PATH=\$PATH:${RACROSS_TOOLS}/android-ndk-r${RACROSS_ANDROIDNDK_VER}" >> ${RACROSS_INITSCRIPT}
+cd ${RACROSS_BASE}
+rm -rf android-ndk-r${RACROSS_ANDROIDNDK_VER}-*
 
 # libretro-super
 echo "*** setup libretro-super ***"
 cd ~
-if [[ ${RACROSS_SETUP_CACHE} = 1 ]] ; then
-	git clone https://github.com/libretro/libretro-super.git
-	cd libretro-super
-	git remote add AZO234 https://github.com/AZO234/libretro-super.git
-	git pull --no-edit AZO234 AZO_fix
-	cd ..
-	tar -Jcf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
-	if [[ ${RACROSS_SETUP_INSTALL} = 0 ]] ; then
-		rm -rf libretro-super
-	fi
-else
-	tar -Jxf ${RACROSS_CACHE}/libretro-super.tar.xz
-fi
+git clone --depth=1 https://github.com/libretro/libretro-super.git
+patch -p1 -d libretro-super < ${RACROSS_BASE}/libretro-super.patch
+tar -Jcf ${RACROSS_CACHE}/libretro-super.tar.xz libretro-super
+chmod +x libretro-super/libretro-build-android-mk.sh
+chmod +x libretro-super/libretro-build-emscripten.sh
+chmod +x libretro-super/libretro-build-libnx.sh
+chmod +x libretro-super/libretro-build-psl1ght.sh
+chmod +x libretro-super/libretro-build-xenon.sh
+chmod +x libretro-super/libretro-build-rpi2.sh
+chmod +x libretro-super/libretro-build-rpi3.sh
 
 # build scripts
-if [[ ${RACROSS_SETUP_INSTALL} = 1 ]] ; then
-	cp ${RACROSS_BASE}/build-core.sh ~/libretro-super/
-fi
+cp ${RACROSS_BASE}/build-core.sh ~/libretro-super
 

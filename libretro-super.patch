@@ -1,0 +1,348 @@
+diff -uprN libretro-super/libretro-build-emscripten.sh libretro-super_/libretro-build-emscripten.sh
+--- libretro-super/libretro-build-emscripten.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-emscripten.sh	2019-03-12 12:55:41.840399000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=emscripten ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build-libnx.sh libretro-super_/libretro-build-libnx.sh
+--- libretro-super/libretro-build-libnx.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-libnx.sh	2019-03-12 12:55:41.856089000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=libnx ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build-psl1ght.sh libretro-super_/libretro-build-psl1ght.sh
+--- libretro-super/libretro-build-psl1ght.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-psl1ght.sh	2019-03-12 12:55:41.856089000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=psl1ght ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build-rpi2.sh libretro-super_/libretro-build-rpi2.sh
+--- libretro-super/libretro-build-rpi2.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-rpi2.sh	2019-03-12 12:55:41.856089000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=rpi2 ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build-rpi3.sh libretro-super_/libretro-build-rpi3.sh
+--- libretro-super/libretro-build-rpi3.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-rpi3.sh	2019-03-12 12:55:41.871680000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=rpi3 ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build-xenon.sh libretro-super_/libretro-build-xenon.sh
+--- libretro-super/libretro-build-xenon.sh	1970-01-01 09:00:00.000000000 +0900
++++ libretro-super_/libretro-build-xenon.sh	2019-03-12 12:55:41.871680000 +0900
+@@ -0,0 +1,17 @@
++#! /usr/bin/env bash
++# vim: set ts=3 sw=3 noet ft=sh : bash
++
++SCRIPT="${0#./}"
++BASE_DIR="${SCRIPT%/*}"
++WORKDIR="$PWD"
++
++if [ "$BASE_DIR" = "$SCRIPT" ]; then
++	BASE_DIR="$WORKDIR"
++else
++	if [[ "$0" != /* ]]; then
++		# Make the path absolute
++		BASE_DIR="$WORKDIR/$BASE_DIR"
++	fi
++fi
++
++platform=xenon ${BASE_DIR}/libretro-build.sh $@
+diff -uprN libretro-super/libretro-build.sh libretro-super_/libretro-build.sh
+--- libretro-super/libretro-build.sh	2019-03-12 17:12:59.138366674 +0900
++++ libretro-super_/libretro-build.sh	2019-03-12 12:55:41.871680000 +0900
+@@ -42,34 +42,34 @@ if [ -z "$MAKE" ]; then
+ 	fi
+ fi
+ 
+-if [ -z "$CC" ]; then
+-	if [ $FORMAT_COMPILER_TARGET = "osx" ]; then
+-		CC=cc
+-	elif uname -s | grep -i MINGW32 > /dev/null 2>&1; then
+-		CC=mingw32-gcc
+-	else
+-		CC=gcc
+-	fi
+-fi
+-
+-if [ -z "$CXX" ]; then
+-	if [ $FORMAT_COMPILER_TARGET = "osx" ]; then
+-		CXX=c++
+-		CXX11="clang++ -std=c++11 -stdlib=libc++"
+-		# FIXME: Do this right later.
+-		if [ "$ARCH" = "i386" ]; then
+-			CC="cc -arch i386"
+-			CXX="c++ -arch i386"
+-			CXX11="clang++ -arch i386 -std=c++11 -stdlib=libc++"
+-		fi
+-	elif uname -s | grep -i MINGW32 > /dev/null 2>&1; then
+-		CXX=mingw32-g++
+-		CXX11=mingw32-g++
+-	else
+-		CXX=g++
+-		CXX11=g++
+-	fi
+-fi
++#if [ -z "$CC" ]; then
++#	if [ $FORMAT_COMPILER_TARGET = "osx" ]; then
++#		CC=cc
++#	elif uname -s | grep -i MINGW32 > /dev/null 2>&1; then
++#		CC=mingw32-gcc
++#	else
++#		CC=gcc
++#	fi
++#fi
++#
++#if [ -z "$CXX" ]; then
++#	if [ $FORMAT_COMPILER_TARGET = "osx" ]; then
++#		CXX=c++
++#		CXX11="clang++ -std=c++11 -stdlib=libc++"
++#		# FIXME: Do this right later.
++#		if [ "$ARCH" = "i386" ]; then
++#			CC="cc -arch i386"
++#			CXX="c++ -arch i386"
++#			CXX11="clang++ -arch i386 -std=c++11 -stdlib=libc++"
++#		fi
++#	elif uname -s | grep -i MINGW32 > /dev/null 2>&1; then
++#		CXX=mingw32-g++
++#		CXX11=mingw32-g++
++#	else
++#		CXX=g++
++#		CXX11=g++
++#	fi
++#fi
+ 
+ FORMAT_COMPILER_TARGET_ALT=$FORMAT_COMPILER_TARGET
+ 
+diff -uprN libretro-super/libretro-config.sh libretro-super_/libretro-config.sh
+--- libretro-super/libretro-config.sh	2019-03-12 17:12:59.142366665 +0900
++++ libretro-super_/libretro-config.sh	2019-03-12 17:11:40.694522002 +0900
+@@ -305,9 +305,9 @@ case "$platform" in
+ 				;;
+ 		esac
+ 		export NDK_ROOT_DIR
+-		CC="$NDK_ROOT_DIR/toolchains/x86-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-gcc"
+-		CXX="$NDK_ROOT_DIR/toolchains/x86-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-g++"
+-		CXX11="$NDK_ROOT_DIR/toolchains/x86-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-g++"
++		CC="$NDK_ROOT_DIR/toolchains/x86-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-gcc"
++		CXX="$NDK_ROOT_DIR/toolchains/x86-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-g++"
++		CXX11="$NDK_ROOT_DIR/toolchains/x86-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/i686-linux-android-g++"
+ 		;;
+ 
+    android-armeabi)
+@@ -333,9 +333,9 @@ case "$platform" in
+ 				;;
+ 		esac
+ 		export NDK_ROOT_DIR
+-		CC="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-gcc"
+-		CXX="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
+-		CXX11="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
++		CC="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-gcc"
++		CXX="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
++		CXX11="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
+ 		;;
+ 
+    android-armeabi_v7a)
+@@ -361,9 +361,9 @@ case "$platform" in
+ 				;;
+ 		esac
+ 		export NDK_ROOT_DIR
+-		CC="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-gcc"
+-		CXX="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
+-		CXX11="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
++		CC="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-gcc"
++		CXX="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
++		CXX11="$NDK_ROOT_DIR/toolchains/arm-linux-androideabi-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/arm-linux-androideabi-g++"
+ 		;;
+ 
+    android-arm64_v8a)
+@@ -417,9 +417,9 @@ case "$platform" in
+ 				;;
+ 		esac
+ 		export NDK_ROOT_DIR
+-		CC="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-gcc"
+-		CXX="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-g++"
+-		CXX11="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.8/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-g++"
++		CC="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-gcc"
++		CXX="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-g++"
++		CXX11="$NDK_ROOT_DIR/toolchains/mipsel-linux-android-4.9/prebuilt/${HOST_PLATFORM}-x86_64/bin/mipsel-linux-android-g++"
+ 		;;
+ 
+    android-mips64)
+@@ -511,7 +511,7 @@ case "$platform" in
+ 		DIST_DIR="ps3"
+ 		FORMAT_EXT=a
+ 		FORMAT_COMPILER_TARGET=ps3
+-		FORMAT_COMPILER_TARGET_ALT=sncps3
++		FORMAT_COMPILER_TARGET_ALT=ps3
+ 		FORMAT=_ps3
+ 
+ 		CC="ppu-lv2-gcc.exe"
+@@ -826,19 +826,39 @@ case "$platform" in
+    				FORMAT_COMPILER_TARGET="emscripten"
+    				DIST_DIR="emscripten"
+    				;;
++				*xenon*)
++   				platform=xenon
++   				FORMAT_EXT="a"
++   				FORMAT_COMPILER_TARGET="xenon"
++   				DIST_DIR="xenon"
++   				;;
+ 				*vita*)
+ 					platform=vita
+ 					FORMAT_EXT="a"
+ 					FORMAT_COMPILER_TARGET="vita"
+ 					DIST_DIR="vita"
+ 					;;
++				*sncps3*)
++					platform=ps3
++					FORMAT_EXT="a"
++					FORMAT_COMPILER_TARGET="sncps3"
++					FORMAT_COMPILER_TARGET_ALT="sncps3"
++					DIST_DIR="sncps3"
++					;;
+ 				*ps3*)
+ 					platform=ps3
+ 					FORMAT_EXT="a"
+ 					FORMAT_COMPILER_TARGET="ps3"
+-					FORMAT_COMPILER_TARGET_ALT="sncps3"
++					FORMAT_COMPILER_TARGET_ALT="ps3"
+ 					DIST_DIR="ps3"
+ 					;;
++				*psl1ght*)
++					platform=psl1ght
++					FORMAT_EXT="a"
++					FORMAT_COMPILER_TARGET="psl1ght"
++					FORMAT_COMPILER_TARGET_ALT="psl1ght"
++					DIST_DIR="psl1ght"
++					;;
+ 				*wii*)
+ 					platform=wii
+ 					FORMAT_EXT="a"
+@@ -851,6 +871,18 @@ case "$platform" in
+ 					FORMAT_COMPILER_TARGET="ngc"
+ 					DIST_DIR="ngc"
+ 					;;
++				*switch*)
++					platform=switch
++					FORMAT_EXT="a"
++					FORMAT_COMPILER_TARGET="switch"
++					DIST_DIR="switch"
++					;;
++				*libnx*)
++					platform=libnx
++					FORMAT_EXT="a"
++					FORMAT_COMPILER_TARGET="libnx"
++					DIST_DIR="libnx"
++					;;
+ 				android-x86_64)
+ 					platform=android-x86_64
+ 					FORMAT_EXT="so"
+@@ -909,11 +941,26 @@ case "$platform" in
+ 					FORMAT_COMPILER_TARGET="android-armv7"
+ 					DIST_DIR="android/armeabi-v7a"
+ 					;;
+-                                linux-armv7-neon)
+-                                        FORMAT_EXT="so"
+-                                        FORMAT_COMPILER_TARGET="unix-armv7-hardfloat-neon"
+-                                        DIST_DIR="unix"
+-                                       ;;
++				linux-armv7-neon)
++					FORMAT_EXT="so"
++					FORMAT_COMPILER_TARGET="unix-armv7-hardfloat-neon"
++					DIST_DIR="unix"
++					;;
++				*cortex*)
++					FORMAT_EXT="so"
++					FORMAT_COMPILER_TARGET="cortex"
++					DIST_DIR="cortex"
++					;;
++				*rpi2*)
++					FORMAT_EXT="so"
++					FORMAT_COMPILER_TARGET="rpi2"
++					DIST_DIR="rpi2"
++					;;
++				*rpi3*)
++					FORMAT_EXT="so"
++					FORMAT_COMPILER_TARGET="rpi3"
++					DIST_DIR="rpi3"
++					;;
+ 				*)
+ 					BINARY_EXT=""
+ 					FORMAT_COMPILER_TARGET="unix"

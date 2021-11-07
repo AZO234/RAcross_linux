@@ -3,17 +3,11 @@
 LR_CORE=np2kai
 LR_CORE_SRC=~/NP2kai
 
-LR_DISTLOG_CLEAN=1
-LR_SRC_FETCH=0
+SRCFETCH=0
 
-export RACROSS_TOOLS=${HOME}/RAcross-tools
+RACROSS_TOOLS=${HOME}/RAcross-tools
 
 cd ~/libretro-super
-
-if [[ ${LR_DISTLOG_CLEAN} = 1 ]] ; then
-rm -rf dist/*
-rm -rf log/*
-fi
 
 unset CC
 unset CXX
@@ -23,7 +17,7 @@ unset LD
 # host(linux x86_64)
 rm -rf libretro-${LR_CORE}
 echo "=== host - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -35,7 +29,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_host.log
 # PSP
 rm -rf libretro-${LR_CORE}
 echo "=== PSP - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -44,10 +38,22 @@ fi
 echo "=== PSP - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_psp.log
 
+# psl1ght
+rm -rf libretro-${LR_CORE}
+echo "=== psl1ght - build start ==="
+if [ ${SRCFETCH} = 1 ] ; then
+./libretro-fetch.sh ${LR_CORE}
+else
+cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
+fi
+./libretro-build-psl1ght.sh ${LR_CORE}
+echo "=== psl1ght - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_psl1ght.log
+
 # Xenon
 rm -rf libretro-${LR_CORE}
 echo "=== Xenon - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -59,7 +65,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_xenon.log
 # Vita
 rm -rf libretro-${LR_CORE}
 echo "=== Vita - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -71,7 +77,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_vita.log
 # Switch
 rm -rf libretro-${LR_CORE}
 echo "=== Switch - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -83,18 +89,19 @@ mv log/${LR_CORE}.log log/${LR_CORE}_switch.log
 # android-mk
 rm -rf libretro-${LR_CORE}
 echo "=== android-mk - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
 fi
-./libretro-build-android-mk.sh ${LR_CORE} 2>&1 | tee log/${LR_CORE}_android.log
+./libretro-build-android-mk.sh ${LR_CORE}
 echo "=== android-mk - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_android.log
 
 # CTR
 rm -rf libretro-${LR_CORE}
 echo "=== CTR - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -106,7 +113,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_ctr.log
 # NGC
 rm -rf libretro-${LR_CORE}
 echo "=== NGC - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -118,7 +125,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_ngc.log
 # Wii
 rm -rf libretro-${LR_CORE}
 echo "=== Wii - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -130,7 +137,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_wii.log
 # WiiU
 rm -rf libretro-${LR_CORE}
 echo "=== WiiU - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -142,7 +149,7 @@ mv log/${LR_CORE}.log log/${LR_CORE}_wiiu.log
 # libnx
 rm -rf libretro-${LR_CORE}
 echo "=== libnx - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -151,88 +158,38 @@ fi
 echo "=== libnx - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_libnx.log
 
-# PS2
-rm -rf libretro-${LR_CORE}
-echo "=== PS2 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-ps2.sh ${LR_CORE}
-echo "=== PS2 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_ps2.log
-
-# PS3
-rm -rf libretro-${LR_CORE}
-echo "=== PS3 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-ps3.sh ${LR_CORE}
-echo "=== PS3 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_ps3.log
-
-# PSL1GHT
-rm -rf libretro-${LR_CORE}
-echo "=== PSL1GHT - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-psl1ght.sh ${LR_CORE}
-echo "=== PSL1GHT - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_psl1ght.log
-
-# iOS Theos
-rm -rf libretro-${LR_CORE}
-echo "=== iOS Theos - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-ios-theos.sh ${LR_CORE}
-echo "=== iOS Theos - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_ios-theos.log
-
-# Classic
-rm -rf libretro-${LR_CORE}
-echo "=== Classic - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-classic_armv7_a7.sh ${LR_CORE}
-echo "=== Classic - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_classic_armv7_a7.log
-
 # Emscripten
-source ${RACROSS_TOOLS}/emsdk/emsdk_env.sh
 rm -rf libretro-${LR_CORE}
 echo "=== Emscripten - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+export EMSDK=${RACROSS_TOOLS}/emsdk
+OLDPATH=$PATH
+export PATH=$PATH:${EMSDK}/emscripten/1.38.28
+export EM_CONFIG=/home/${USER}/.emscripten
+export EMSCRIPTEN_NATIVE_OPTIMIZER=${EMSDK}/clang/e1.38.28_64bit/optimizer
+export EMSCRIPTEN=${EMSDK}/emscripten/1.38.28
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
 fi
 ./libretro-build-emscripten.sh ${LR_CORE}
+unset EMSDK
+export PATH=$OLDPATH
+unset EM_CONFIG
+unset EMSCRIPTEN_NATIVE_OPTIMIZER
+unset EMSCRIPTEN
 echo "=== Emscripten - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_emscripten.log
 
-# RPi2
 export CC=armv7-rpi2-linux-gnueabihf-gcc
 export CXX=armv7-rpi2-linux-gnueabihf-g++
 export AR=armv7-rpi2-linux-gnueabihf-ar
 export LD=armv7-rpi2-linux-gnueabihf-g++
 
+# RPi2
 rm -rf libretro-${LR_CORE}
 echo "=== RPi2 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
@@ -241,56 +198,22 @@ fi
 echo "=== RPi2 - build end ==="
 mv log/${LR_CORE}.log log/${LR_CORE}_rpi2.log
 
-# ARMv8 RPi3
 export CC=armv8-rpi3-linux-gnueabihf-gcc
 export CXX=armv8-rpi3-linux-gnueabihf-g++
 export AR=armv8-rpi3-linux-gnueabihf-ar
 export LD=armv8-rpi3-linux-gnueabihf-g++
 
+# RPi3
 rm -rf libretro-${LR_CORE}
-echo "=== ARMv8 RPi3 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
+echo "=== RPi3 - build start ==="
+if [ ${SRCFETCH} = 1 ] ; then
 ./libretro-fetch.sh ${LR_CORE}
 else
 cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
 fi
-./libretro-build-armv8-rpi3.sh ${LR_CORE}
-echo "=== ARMv8 RPi3 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_armv8_rpi3.log
-
-# AArch64 RPi3
-export CC=aarch64-rpi3-linux-gnu-gcc
-export CXX=aarch64-rpi3-linux-gnu-g++
-export AR=aarch64-rpi3-linux-gnu-ar
-export LD=aarch64-rpi3-linux-gnu-g++
-
-rm -rf libretro-${LR_CORE}
-echo "=== AArch64 RPi3 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-aarch64-rpi3.sh ${LR_CORE}
-echo "=== AArch64 RPi3 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_aarch64_rpi3.log
-
-# RPi4
-export CC=aarch64-rpi4-linux-gnu-gcc
-export CXX=aarch64-rpi4-linux-gnu-g++
-export AR=aarch64-rpi4-linux-gnu-ar
-export LD=aarch64-rpi4-linux-gnu-g++
-
-rm -rf libretro-${LR_CORE}
-echo "=== RPi4 - build start ==="
-if [[ ${LR_SRC_FETCH} = 1 ]] ; then
-./libretro-fetch.sh ${LR_CORE}
-else
-cp -rf ${LR_CORE_SRC} libretro-${LR_CORE}
-fi
-./libretro-build-rpi4.sh ${LR_CORE}
-echo "=== RPi4 - build end ==="
-mv log/${LR_CORE}.log log/${LR_CORE}_rpi4.log
+./libretro-build-rpi3.sh ${LR_CORE}
+echo "=== RPi3 - build end ==="
+mv log/${LR_CORE}.log log/${LR_CORE}_rpi3.log
 
 unset CC
 unset CXX
